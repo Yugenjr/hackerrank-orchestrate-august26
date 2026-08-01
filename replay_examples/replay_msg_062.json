@@ -1,0 +1,242 @@
+{
+  "message_id": "msg_062",
+  "pipeline_version": "1.0.0",
+  "trace": [
+    {
+      "stage": "FeatureExtractionStage",
+      "latency_ms": 0.0095367431640625,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "conversation_type": "group",
+        "forwarded_count": 7,
+        "baseline_scam_risk": false,
+        "urgency": "medium",
+        "importance": "routine",
+        "safety": {
+          "is_safe": true,
+          "safety_reason": "Safety engine stub (M4 pending)",
+          "safety_flags": []
+        }
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
+      "stage": "SafetyStage",
+      "latency_ms": 0.0021457672119140625,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "is_safe": true,
+        "safety_reason": "Safety engine stub (M4 pending)",
+        "safety_flags": []
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
+      "stage": "RetrievalStage",
+      "latency_ms": 0.007152557373046875,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "evidence_message_ids": [
+          "none"
+        ],
+        "retrieval_confidence": 0.0,
+        "retrieval_reason": "No historical evidence found (Cold Start).",
+        "retrieval_metadata": {
+          "candidate_count": 0,
+          "filtered_count": 0,
+          "bm25_score": 0.0,
+          "embedding_score": 0.0,
+          "recency_score": 0.0,
+          "fusion_score": 0.0,
+          "rerank_score": 0.0
+        }
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
+      "stage": "NotificationIntelligenceStage",
+      "latency_ms": 0.11515617370605469,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "has_media": false,
+        "entities": {
+          "people": [],
+          "organizations": [],
+          "dates": [],
+          "times": [],
+          "locations": [],
+          "money": [],
+          "urls": [],
+          "phones": [],
+          "qr_codes": []
+        },
+        "structures": {
+          "deadlines": [],
+          "action_items": [],
+          "events": []
+        },
+        "features": {
+          "urgency": {
+            "value": "medium",
+            "confidence": 0.9,
+            "evidence": "medium"
+          },
+          "importance": {
+            "value": "routine",
+            "confidence": 0.85,
+            "evidence": "routine"
+          },
+          "requires_action": {
+            "value": false,
+            "confidence": 0.9,
+            "evidence": "action keywords"
+          },
+          "deadline_detected": {
+            "value": false,
+            "confidence": 0.8,
+            "evidence": "due keyword"
+          },
+          "payment_related": {
+            "value": false,
+            "confidence": 0.95,
+            "evidence": "money keywords"
+          },
+          "event_related": {
+            "value": false,
+            "confidence": 0.9,
+            "evidence": "event keywords"
+          },
+          "personal_related": {
+            "value": false,
+            "confidence": 0.7,
+            "evidence": "family keywords"
+          },
+          "business_related": {
+            "value": false,
+            "confidence": 0.9,
+            "evidence": "business keywords"
+          },
+          "scam_probability": {
+            "value": 0.05,
+            "confidence": 0.8,
+            "evidence": "scam heuristics"
+          },
+          "spam_probability": {
+            "value": 0.1,
+            "confidence": 0.8,
+            "evidence": "spam heuristics"
+          }
+        },
+        "contradiction": {
+          "has_contradiction": false,
+          "description": "No contradiction detected.",
+          "confidence": 1.0
+        }
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
+      "stage": "DecisionStage",
+      "latency_ms": 0.21266937255859375,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "decision": {
+          "message_id": "msg_062",
+          "action": "digest",
+          "message_type": "personal",
+          "reason": "Digest: Low priority personal update, saved for later.",
+          "confidence": 0.5,
+          "evidence_message_ids": "none"
+        },
+        "decision_trace": {
+          "message_id": "msg_062",
+          "steps": [
+            {
+              "step": "deterministic_policy",
+              "matched": false
+            },
+            {
+              "step": "safety_check",
+              "is_safe": true
+            },
+            {
+              "step": "llm_router",
+              "raw_decision": {
+                "action": "digest",
+                "message_type": "personal",
+                "llm_confidence": 0.8
+              }
+            },
+            {
+              "step": "final_output",
+              "action": "digest",
+              "confidence": 0.5
+            }
+          ]
+        }
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
+      "stage": "SerializationStage",
+      "latency_ms": 0.3211498260498047,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": true,
+      "cache_hit": false,
+      "error": null
+    }
+  ],
+  "decision": {
+    "decision": {
+      "message_id": "msg_062",
+      "action": "digest",
+      "message_type": "personal",
+      "reason": "Digest: Low priority personal update, saved for later.",
+      "confidence": 0.5,
+      "evidence_message_ids": "none"
+    },
+    "decision_trace": {
+      "message_id": "msg_062",
+      "steps": [
+        {
+          "step": "deterministic_policy",
+          "matched": false
+        },
+        {
+          "step": "safety_check",
+          "is_safe": true
+        },
+        {
+          "step": "llm_router",
+          "raw_decision": {
+            "action": "digest",
+            "message_type": "personal",
+            "llm_confidence": 0.8
+          }
+        },
+        {
+          "step": "final_output",
+          "action": "digest",
+          "confidence": 0.5
+        }
+      ]
+    }
+  }
+}

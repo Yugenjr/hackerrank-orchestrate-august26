@@ -1,11 +1,13 @@
 deterministic_overrides:
   otp_2fa:
+    rule_type: "hard"
     priority: 10
     regex_match: '(?i)\b(code|otp|pin|verification)\b.*\b\d{4,8}\b'
     force_action: "notify"
     force_type: "otp"
     
   payment_reminder:
+    rule_type: "soft"
     priority: 9
     business_trust_min: 0.8
     intent_match: 'payment|invoice|bill|due'
@@ -13,6 +15,7 @@ deterministic_overrides:
     force_type: "payment_reminder"
     
   family_emergency:
+    rule_type: "hard"
     priority: 100
     interaction_strength_min: 0.7
     keyword_match: 'hospital|emergency|accident|help me|urgent|911'
@@ -20,11 +23,13 @@ deterministic_overrides:
     force_type: "urgent"
     
   muted_group:
+    rule_type: "hard"
     priority: 50
     group_muted: true
     force_action: "mute"
     
   forwarded_spam:
+    rule_type: "soft"
     priority: 60
     forward_count_min: 5
     sender_trust_max: 0.2

@@ -234,7 +234,7 @@ class RetrievalEngine:
                 (weights["trust"] * trust_score) +
                 (weights["recency"] * recency)
             )
-            fusion_scores.append((raw_fusion * decay, i, recency))
+            fusion_scores.append((raw_fusion, i, recency))
             
         fusion_scores.sort(key=lambda x: x[0], reverse=True)
         top_k = fusion_scores[:10] # Top 10 for clustering
@@ -257,17 +257,21 @@ class RetrievalEngine:
         if not self.use_mocks:
             rerank_scores = 1 / (1 + np.exp(-rerank_scores))
             
-        best_idx = int(np.argmax(rerank_scores))
+        # Bypassing cross-encoder for the final score and candidate selection because it squashes WhatsApp text logits to zero.
+        best_idx = 0  # clustered_cands is ordered by fusion score
         best_cand = clustered_cands[best_idx]
-        best_score = float(rerank_scores[best_idx])
+        
+        # Extract fusion score
+        best_orig_idx = candidates.index(best_cand)
+        best_score = float([fs for fs, i, _ in fusion_scores if i == best_orig_idx][0])
         
         # Retrieve Original Fusion metrics for observability
         best_orig_idx = candidates.index(best_cand)
         meta["bm25_score"] = float(bm25_scores[best_orig_idx])
         meta["embedding_score"] = float(aligned_faiss[best_orig_idx])
-        meta["fusion_score"] = float([fs for fs, i, _ in fusion_scores if i == best_orig_idx][0])
+        meta["fusion_score"] = best_score
         meta["recency_score"] = float([rs for _, i, rs in fusion_scores if i == best_orig_idx][0])
-        meta["rerank_score"] = best_score
+        meta["rerank_score"] = float(rerank_scores[best_idx]) if len(rerank_scores) > 0 else 0.0
         
         # Stage 6: Adaptive Thresholding
         threshold = self.config.BASE_CONFIDENCE_THRESHOLD
