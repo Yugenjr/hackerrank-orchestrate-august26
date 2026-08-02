@@ -22,11 +22,23 @@ deterministic_overrides:
     force_action: "notify"
     force_type: "urgent"
     
+  opted_out_promotions:
+    rule_type: "hard"
+    priority: 80
+    force_action: "mute"
+    force_type: "spam"
+
   muted_group:
     rule_type: "hard"
     priority: 50
     group_muted: true
     force_action: "mute"
+    
+  dnd_active:
+    rule_type: "hard"
+    priority: 45
+    force_action: "digest"
+    force_type: "personal"
     
   forwarded_spam:
     rule_type: "soft"

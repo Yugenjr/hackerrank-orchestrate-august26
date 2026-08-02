@@ -4,16 +4,24 @@
   "trace": [
     {
       "stage": "FeatureExtractionStage",
-      "latency_ms": 0.02765655517578125,
+      "latency_ms": 0.019788742065429688,
       "status": "success",
       "retries": 0,
       "degraded": false,
       "outputs": {
         "conversation_type": "personal",
         "forwarded_count": 0,
-        "baseline_scam_risk": false,
+        "user_dnd_active": false,
+        "user_global_dismissal_rate": 0.7857142857142857,
         "urgency": "low",
         "importance": "routine",
+        "scam_probability": 0.05,
+        "spam_probability": 0.1,
+        "requires_action": false,
+        "payment_related": false,
+        "event_related": false,
+        "personal_related": false,
+        "business_related": false,
         "safety": {
           "is_safe": true,
           "safety_reason": "Safety engine stub (M4 pending)",
@@ -24,47 +32,8 @@
       "error": null
     },
     {
-      "stage": "SafetyStage",
-      "latency_ms": 0.0030994415283203125,
-      "status": "success",
-      "retries": 0,
-      "degraded": false,
-      "outputs": {
-        "is_safe": true,
-        "safety_reason": "Safety engine stub (M4 pending)",
-        "safety_flags": []
-      },
-      "cache_hit": false,
-      "error": null
-    },
-    {
-      "stage": "RetrievalStage",
-      "latency_ms": 0.023365020751953125,
-      "status": "success",
-      "retries": 0,
-      "degraded": false,
-      "outputs": {
-        "evidence_message_ids": [
-          "none"
-        ],
-        "retrieval_confidence": 0.0,
-        "retrieval_reason": "No historical evidence found (Cold Start).",
-        "retrieval_metadata": {
-          "candidate_count": 0,
-          "filtered_count": 0,
-          "bm25_score": 0.0,
-          "embedding_score": 0.0,
-          "recency_score": 0.0,
-          "fusion_score": 0.0,
-          "rerank_score": 0.0
-        }
-      },
-      "cache_hit": false,
-      "error": null
-    },
-    {
       "stage": "NotificationIntelligenceStage",
-      "latency_ms": 0.19621849060058594,
+      "latency_ms": 0.10228157043457031,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -148,8 +117,55 @@
       "error": null
     },
     {
+      "stage": "SafetyStage",
+      "latency_ms": 0.0016689300537109375,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "is_safe": true,
+        "safety_reason": "Safety engine stub (M4 pending)",
+        "safety_flags": []
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
+      "stage": "RetrievalStage",
+      "latency_ms": 2.6776790618896484,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "evidence_message_ids": [
+          "message_0224"
+        ],
+        "retrieval_confidence": 0.7805187459187966,
+        "retrieval_reason": "High relevance semantic match. Score exceeded adaptive threshold 0.50",
+        "retrieval_metadata": {
+          "candidate_count": 10,
+          "filtered_count": 1,
+          "bm25_score": 1.0,
+          "embedding_score": 0.7547215223312378,
+          "recency_score": 0.7863013698630137,
+          "fusion_score": 0.7805187459187966,
+          "rerank_score": 0.0,
+          "evidence_list": [
+            {
+              "message_id": "message_0224",
+              "message_text": "I have kept the blue jacket aside for you till 7 PM. If you still want it, please confirm before I show it to someone else.",
+              "similarity": 0.7547215223312378,
+              "retrieval_score": 0.7805187459187966
+            }
+          ]
+        }
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
       "stage": "DecisionStage",
-      "latency_ms": 0.17952919006347656,
+      "latency_ms": 21.991729736328125,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -159,14 +175,14 @@
           "action": "digest",
           "message_type": "personal",
           "reason": "Digest: Low priority personal update, saved for later.",
-          "confidence": 0.5,
+          "confidence": 0.31418571428571423,
           "evidence_message_ids": "none"
         },
         "decision_trace": {
           "message_id": "msg_104",
           "steps": [
             {
-              "step": "deterministic_policy",
+              "step": "hard_policy",
               "matched": false
             },
             {
@@ -178,15 +194,25 @@
               "raw_decision": {
                 "action": "digest",
                 "message_type": "personal",
-                "llm_confidence": 0.8
+                "llm_confidence": 0.5236428571428571
               }
             },
             {
               "step": "final_output",
               "action": "digest",
-              "confidence": 0.5
+              "confidence": 0.31418571428571423
             }
-          ]
+          ],
+          "explanation": {
+            "top_features_triggered": [
+              "ML Features Configured"
+            ],
+            "evidence_messages": [
+              "none"
+            ],
+            "soft_rules": [],
+            "hard_rule_triggered": null
+          }
         }
       },
       "cache_hit": false,
@@ -194,7 +220,7 @@
     },
     {
       "stage": "SerializationStage",
-      "latency_ms": 2.3398399353027344,
+      "latency_ms": 0.0095367431640625,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -209,14 +235,14 @@
       "action": "digest",
       "message_type": "personal",
       "reason": "Digest: Low priority personal update, saved for later.",
-      "confidence": 0.5,
+      "confidence": 0.31418571428571423,
       "evidence_message_ids": "none"
     },
     "decision_trace": {
       "message_id": "msg_104",
       "steps": [
         {
-          "step": "deterministic_policy",
+          "step": "hard_policy",
           "matched": false
         },
         {
@@ -228,15 +254,25 @@
           "raw_decision": {
             "action": "digest",
             "message_type": "personal",
-            "llm_confidence": 0.8
+            "llm_confidence": 0.5236428571428571
           }
         },
         {
           "step": "final_output",
           "action": "digest",
-          "confidence": 0.5
+          "confidence": 0.31418571428571423
         }
-      ]
+      ],
+      "explanation": {
+        "top_features_triggered": [
+          "ML Features Configured"
+        ],
+        "evidence_messages": [
+          "none"
+        ],
+        "soft_rules": [],
+        "hard_rule_triggered": null
+      }
     }
   }
 }

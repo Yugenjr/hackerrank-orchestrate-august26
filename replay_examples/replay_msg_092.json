@@ -4,16 +4,28 @@
   "trace": [
     {
       "stage": "FeatureExtractionStage",
-      "latency_ms": 0.016927719116210938,
+      "latency_ms": 0.023126602172851562,
       "status": "success",
       "retries": 0,
       "degraded": false,
       "outputs": {
         "conversation_type": "business",
         "forwarded_count": 0,
+        "user_dnd_active": false,
+        "user_global_dismissal_rate": 0.25190839694656486,
+        "business_trust_score": 1.0,
+        "business_verified": true,
+        "business_high_reports": false,
         "baseline_scam_risk": false,
         "urgency": "low",
         "importance": "routine",
+        "scam_probability": 0.05,
+        "spam_probability": 0.1,
+        "requires_action": true,
+        "payment_related": true,
+        "event_related": false,
+        "personal_related": false,
+        "business_related": false,
         "safety": {
           "is_safe": true,
           "safety_reason": "Safety engine stub (M4 pending)",
@@ -24,47 +36,8 @@
       "error": null
     },
     {
-      "stage": "SafetyStage",
-      "latency_ms": 0.00286102294921875,
-      "status": "success",
-      "retries": 0,
-      "degraded": false,
-      "outputs": {
-        "is_safe": true,
-        "safety_reason": "Safety engine stub (M4 pending)",
-        "safety_flags": []
-      },
-      "cache_hit": false,
-      "error": null
-    },
-    {
-      "stage": "RetrievalStage",
-      "latency_ms": 0.018596649169921875,
-      "status": "success",
-      "retries": 0,
-      "degraded": false,
-      "outputs": {
-        "evidence_message_ids": [
-          "none"
-        ],
-        "retrieval_confidence": 0.0,
-        "retrieval_reason": "No historical evidence found (Cold Start).",
-        "retrieval_metadata": {
-          "candidate_count": 0,
-          "filtered_count": 0,
-          "bm25_score": 0.0,
-          "embedding_score": 0.0,
-          "recency_score": 0.0,
-          "fusion_score": 0.0,
-          "rerank_score": 0.0
-        }
-      },
-      "cache_hit": false,
-      "error": null
-    },
-    {
       "stage": "NotificationIntelligenceStage",
-      "latency_ms": 0.3485679626464844,
+      "latency_ms": 0.10538101196289062,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -154,8 +127,48 @@
       "error": null
     },
     {
+      "stage": "SafetyStage",
+      "latency_ms": 0.00095367431640625,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "is_safe": true,
+        "safety_reason": "Safety engine stub (M4 pending)",
+        "safety_flags": []
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
+      "stage": "RetrievalStage",
+      "latency_ms": 0.3752708435058594,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "evidence_message_ids": [
+          "none"
+        ],
+        "retrieval_confidence": 0.0,
+        "retrieval_reason": "No historical evidence found.",
+        "retrieval_metadata": {
+          "candidate_count": 0,
+          "filtered_count": 0,
+          "bm25_score": 0.0,
+          "embedding_score": 0.0,
+          "recency_score": 0.0,
+          "fusion_score": 0.0,
+          "rerank_score": 0.0,
+          "evidence_list": []
+        }
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
       "stage": "DecisionStage",
-      "latency_ms": 0.8697509765625,
+      "latency_ms": 17.877817153930664,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -163,16 +176,16 @@
         "decision": {
           "message_id": "msg_092",
           "action": "digest",
-          "message_type": "personal",
-          "reason": "Digest: Low priority personal update, saved for later.",
-          "confidence": 0.5,
+          "message_type": "event",
+          "reason": "Digest: Low priority event update, saved for later.",
+          "confidence": 0.3945000000000001,
           "evidence_message_ids": "none"
         },
         "decision_trace": {
           "message_id": "msg_092",
           "steps": [
             {
-              "step": "deterministic_policy",
+              "step": "hard_policy",
               "matched": false
             },
             {
@@ -182,17 +195,38 @@
             {
               "step": "llm_router",
               "raw_decision": {
-                "action": "digest",
-                "message_type": "personal",
-                "llm_confidence": 0.8
+                "action": "notify",
+                "message_type": "event",
+                "llm_confidence": 0.4075000000000001
               }
+            },
+            {
+              "step": "conflict_resolution",
+              "override": "low_confidence_digest"
             },
             {
               "step": "final_output",
               "action": "digest",
-              "confidence": 0.5
+              "confidence": 0.3945000000000001
             }
-          ]
+          ],
+          "explanation": {
+            "top_features_triggered": [
+              "ML Features Configured"
+            ],
+            "evidence_messages": [
+              "none"
+            ],
+            "soft_rules": [
+              {
+                "rule_name": "payment_reminder",
+                "suggested_action": "notify",
+                "suggested_type": "payment_reminder",
+                "reason": "Deterministic soft match: Trusted business payment reminder."
+              }
+            ],
+            "hard_rule_triggered": null
+          }
         }
       },
       "cache_hit": false,
@@ -200,7 +234,7 @@
     },
     {
       "stage": "SerializationStage",
-      "latency_ms": 0.9739398956298828,
+      "latency_ms": 0.014781951904296875,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -213,16 +247,16 @@
     "decision": {
       "message_id": "msg_092",
       "action": "digest",
-      "message_type": "personal",
-      "reason": "Digest: Low priority personal update, saved for later.",
-      "confidence": 0.5,
+      "message_type": "event",
+      "reason": "Digest: Low priority event update, saved for later.",
+      "confidence": 0.3945000000000001,
       "evidence_message_ids": "none"
     },
     "decision_trace": {
       "message_id": "msg_092",
       "steps": [
         {
-          "step": "deterministic_policy",
+          "step": "hard_policy",
           "matched": false
         },
         {
@@ -232,17 +266,38 @@
         {
           "step": "llm_router",
           "raw_decision": {
-            "action": "digest",
-            "message_type": "personal",
-            "llm_confidence": 0.8
+            "action": "notify",
+            "message_type": "event",
+            "llm_confidence": 0.4075000000000001
           }
+        },
+        {
+          "step": "conflict_resolution",
+          "override": "low_confidence_digest"
         },
         {
           "step": "final_output",
           "action": "digest",
-          "confidence": 0.5
+          "confidence": 0.3945000000000001
         }
-      ]
+      ],
+      "explanation": {
+        "top_features_triggered": [
+          "ML Features Configured"
+        ],
+        "evidence_messages": [
+          "none"
+        ],
+        "soft_rules": [
+          {
+            "rule_name": "payment_reminder",
+            "suggested_action": "notify",
+            "suggested_type": "payment_reminder",
+            "reason": "Deterministic soft match: Trusted business payment reminder."
+          }
+        ],
+        "hard_rule_triggered": null
+      }
     }
   }
 }

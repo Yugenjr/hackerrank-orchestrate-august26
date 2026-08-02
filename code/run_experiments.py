@@ -1,4 +1,3 @@
-import os
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import cross_val_score, StratifiedKFold
@@ -57,7 +56,7 @@ print(f"Brier Score (0 is perfect, 1 is worst): {brier:.4f}")
 
 # ECE Calculation
 n_bins = 5
-merged['bin'] = pd.cut(merged['confidence'], bins=np.linspace(0, 1, n_bins+1), labels=False, include_lowest=True)
+merged['bin'] = pd.cut(merged['confidence'], bins=np.linspace(0, 1, n_bins+1), labels=False, include_lowest=True)  # type: ignore
 ece = 0.0
 print('\nReliability Diagram Data (Bins):')
 print('Bin Range | Mean Conf | Accuracy | Count')

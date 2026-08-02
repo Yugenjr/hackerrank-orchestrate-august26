@@ -25,6 +25,9 @@ class RetrievalConfig:
     BUSINESS_THRESHOLD_MODIFIER = -0.10  # More lenient for business matches
     SPARSE_HISTORY_MODIFIER = +0.10     # Stricter if history is sparse
 
+    # Toggles
+    USE_CROSS_ENCODER = False
+
     @classmethod
     def get_weights(cls) -> Dict[str, float]:
         return {

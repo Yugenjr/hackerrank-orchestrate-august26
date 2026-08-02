@@ -38,16 +38,16 @@ def test_is_dnd_active(mock_data_loader):
     builder = ContextBuilder(mock_data_loader)
     
     # 22:00 to 07:00
-    assert builder._is_dnd_active("2026-08-01T23:00:00Z", "22:00-07:00") == True
-    assert builder._is_dnd_active("2026-08-01T03:00:00Z", "22:00-07:00") == True
-    assert builder._is_dnd_active("2026-08-01T12:00:00Z", "22:00-07:00") == False
+    assert builder._is_dnd_active("2026-08-01T23:00:00Z", "22:00-07:00")
+    assert builder._is_dnd_active("2026-08-01T03:00:00Z", "22:00-07:00")
+    assert not builder._is_dnd_active("2026-08-01T12:00:00Z", "22:00-07:00")
     
     # Missing or nan
-    assert builder._is_dnd_active("2026-08-01T23:00:00Z", "nan") == False
+    assert not builder._is_dnd_active("2026-08-01T23:00:00Z", "nan")
     
     # 09:00 to 17:00 (no wrap around)
-    assert builder._is_dnd_active("2026-08-01T10:00:00Z", "09:00-17:00") == True
-    assert builder._is_dnd_active("2026-08-01T20:00:00Z", "09:00-17:00") == False
+    assert builder._is_dnd_active("2026-08-01T10:00:00Z", "09:00-17:00")
+    assert not builder._is_dnd_active("2026-08-01T20:00:00Z", "09:00-17:00")
 
 def test_build_context_group(mock_data_loader):
     builder = ContextBuilder(mock_data_loader)
@@ -61,8 +61,8 @@ def test_build_context_group(mock_data_loader):
     
     context = builder.build_context(msg_row)
     assert context["conversation_type"] == "group"
-    assert context["user_dnd_active"] == False
-    assert context["group_muted_by_user"] == True
+    assert not context["user_dnd_active"]
+    assert context["group_muted_by_user"]
     assert context["group_priority_score"] == 0.2  # 2 / 10
     assert context["user_global_dismissal_rate"] == 0.25  # 5 / (15 + 5)
 
@@ -78,8 +78,8 @@ def test_build_context_business(mock_data_loader):
     
     context = builder.build_context(msg_row)
     assert context["conversation_type"] == "business"
-    assert context["user_dnd_active"] == True
-    assert context["business_verified"] == True
-    assert context["business_promotions_opted_out"] == True
+    assert context["user_dnd_active"]
+    assert context["business_verified"]
+    assert context["business_promotions_opted_out"]
     assert context["business_trust_score"] == 1.0  # +0.5 verified, +0.5 matching domain
-    assert context["baseline_scam_risk"] == False  # trust score > 0.5
+    assert not context["baseline_scam_risk"]  # trust score > 0.5

@@ -25,21 +25,21 @@ class StructuralElements(BaseModel):
     events: List[Signal[str]] = Field(default_factory=list)
 
 class NotificationFeatureVector(BaseModel):
-    urgency: Signal[str] = Field(description="Enum: low, medium, high")
-    importance: Signal[str] = Field(description="Enum: routine, notable, critical")
-    requires_action: Signal[bool]
-    deadline_detected: Signal[bool]
-    payment_related: Signal[bool]
-    event_related: Signal[bool]
-    personal_related: Signal[bool]
-    business_related: Signal[bool]
-    scam_probability: Signal[float]
-    spam_probability: Signal[float]
+    urgency: Signal[str] = Field(default=Signal(value="low", confidence=1.0, evidence="fallback"), description="Enum: low, medium, high")
+    importance: Signal[str] = Field(default=Signal(value="routine", confidence=1.0, evidence="fallback"), description="Enum: routine, notable, critical")
+    requires_action: Signal[bool] = Field(default=Signal(value=False, confidence=1.0, evidence="fallback"))
+    deadline_detected: Signal[bool] = Field(default=Signal(value=False, confidence=1.0, evidence="fallback"))
+    payment_related: Signal[bool] = Field(default=Signal(value=False, confidence=1.0, evidence="fallback"))
+    event_related: Signal[bool] = Field(default=Signal(value=False, confidence=1.0, evidence="fallback"))
+    personal_related: Signal[bool] = Field(default=Signal(value=False, confidence=1.0, evidence="fallback"))
+    business_related: Signal[bool] = Field(default=Signal(value=False, confidence=1.0, evidence="fallback"))
+    scam_probability: Signal[float] = Field(default=Signal(value=0.0, confidence=1.0, evidence="fallback"))
+    spam_probability: Signal[float] = Field(default=Signal(value=0.0, confidence=1.0, evidence="fallback"))
 
 class Contradiction(BaseModel):
-    has_contradiction: bool
-    description: str
-    confidence: float
+    has_contradiction: bool = False
+    description: str = "fallback"
+    confidence: float = 1.0
 
 class MediaContext(BaseModel):
     has_media: bool

@@ -4,16 +4,27 @@
   "trace": [
     {
       "stage": "FeatureExtractionStage",
-      "latency_ms": 0.011444091796875,
+      "latency_ms": 0.02288818359375,
       "status": "success",
       "retries": 0,
       "degraded": false,
       "outputs": {
         "conversation_type": "group",
         "forwarded_count": 0,
-        "baseline_scam_risk": false,
+        "user_dnd_active": false,
+        "user_global_dismissal_rate": 0.5728155339805825,
+        "group_muted_by_user": false,
+        "group_muted": false,
+        "group_priority_score": 0.25,
         "urgency": "low",
         "importance": "notable",
+        "scam_probability": 0.05,
+        "spam_probability": 0.1,
+        "requires_action": false,
+        "payment_related": false,
+        "event_related": false,
+        "personal_related": false,
+        "business_related": false,
         "safety": {
           "is_safe": true,
           "safety_reason": "Safety engine stub (M4 pending)",
@@ -24,47 +35,8 @@
       "error": null
     },
     {
-      "stage": "SafetyStage",
-      "latency_ms": 0.00095367431640625,
-      "status": "success",
-      "retries": 0,
-      "degraded": false,
-      "outputs": {
-        "is_safe": true,
-        "safety_reason": "Safety engine stub (M4 pending)",
-        "safety_flags": []
-      },
-      "cache_hit": false,
-      "error": null
-    },
-    {
-      "stage": "RetrievalStage",
-      "latency_ms": 0.009059906005859375,
-      "status": "success",
-      "retries": 0,
-      "degraded": false,
-      "outputs": {
-        "evidence_message_ids": [
-          "none"
-        ],
-        "retrieval_confidence": 0.0,
-        "retrieval_reason": "No historical evidence found (Cold Start).",
-        "retrieval_metadata": {
-          "candidate_count": 0,
-          "filtered_count": 0,
-          "bm25_score": 0.0,
-          "embedding_score": 0.0,
-          "recency_score": 0.0,
-          "fusion_score": 0.0,
-          "rerank_score": 0.0
-        }
-      },
-      "cache_hit": false,
-      "error": null
-    },
-    {
       "stage": "NotificationIntelligenceStage",
-      "latency_ms": 0.14662742614746094,
+      "latency_ms": 0.09608268737792969,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -148,8 +120,55 @@
       "error": null
     },
     {
+      "stage": "SafetyStage",
+      "latency_ms": 0.001430511474609375,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "is_safe": true,
+        "safety_reason": "Safety engine stub (M4 pending)",
+        "safety_flags": []
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
+      "stage": "RetrievalStage",
+      "latency_ms": 1.6694068908691406,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "evidence_message_ids": [
+          "message_0266"
+        ],
+        "retrieval_confidence": 0.7550683830862177,
+        "retrieval_reason": "High relevance semantic match. Score exceeded adaptive threshold 0.50",
+        "retrieval_metadata": {
+          "candidate_count": 20,
+          "filtered_count": 12,
+          "bm25_score": 1.0,
+          "embedding_score": 0.7440065741539001,
+          "recency_score": 0.8246575342465754,
+          "fusion_score": 0.7550683830862177,
+          "rerank_score": 0.0,
+          "evidence_list": [
+            {
+              "message_id": "message_0266",
+              "message_text": "@u_010 upload finished? I am waiting before sending the client status mail.",
+              "similarity": 0.7440065741539001,
+              "retrieval_score": 0.7550683830862177
+            }
+          ]
+        }
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
       "stage": "DecisionStage",
-      "latency_ms": 0.21982192993164062,
+      "latency_ms": 19.155263900756836,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -157,16 +176,16 @@
         "decision": {
           "message_id": "msg_057",
           "action": "digest",
-          "message_type": "personal",
-          "reason": "Digest: Low priority personal update, saved for later.",
-          "confidence": 0.5,
+          "message_type": "event",
+          "reason": "Digest: Low priority event update, saved for later.",
+          "confidence": 0.37100000000000005,
           "evidence_message_ids": "none"
         },
         "decision_trace": {
           "message_id": "msg_057",
           "steps": [
             {
-              "step": "deterministic_policy",
+              "step": "hard_policy",
               "matched": false
             },
             {
@@ -176,17 +195,31 @@
             {
               "step": "llm_router",
               "raw_decision": {
-                "action": "digest",
-                "message_type": "personal",
-                "llm_confidence": 0.8
+                "action": "notify",
+                "message_type": "event",
+                "llm_confidence": 0.6183333333333334
               }
+            },
+            {
+              "step": "conflict_resolution",
+              "override": "low_confidence_digest"
             },
             {
               "step": "final_output",
               "action": "digest",
-              "confidence": 0.5
+              "confidence": 0.37100000000000005
             }
-          ]
+          ],
+          "explanation": {
+            "top_features_triggered": [
+              "ML Features Configured"
+            ],
+            "evidence_messages": [
+              "none"
+            ],
+            "soft_rules": [],
+            "hard_rule_triggered": null
+          }
         }
       },
       "cache_hit": false,
@@ -194,7 +227,7 @@
     },
     {
       "stage": "SerializationStage",
-      "latency_ms": 0.4086494445800781,
+      "latency_ms": 0.0095367431640625,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -207,16 +240,16 @@
     "decision": {
       "message_id": "msg_057",
       "action": "digest",
-      "message_type": "personal",
-      "reason": "Digest: Low priority personal update, saved for later.",
-      "confidence": 0.5,
+      "message_type": "event",
+      "reason": "Digest: Low priority event update, saved for later.",
+      "confidence": 0.37100000000000005,
       "evidence_message_ids": "none"
     },
     "decision_trace": {
       "message_id": "msg_057",
       "steps": [
         {
-          "step": "deterministic_policy",
+          "step": "hard_policy",
           "matched": false
         },
         {
@@ -226,17 +259,31 @@
         {
           "step": "llm_router",
           "raw_decision": {
-            "action": "digest",
-            "message_type": "personal",
-            "llm_confidence": 0.8
+            "action": "notify",
+            "message_type": "event",
+            "llm_confidence": 0.6183333333333334
           }
+        },
+        {
+          "step": "conflict_resolution",
+          "override": "low_confidence_digest"
         },
         {
           "step": "final_output",
           "action": "digest",
-          "confidence": 0.5
+          "confidence": 0.37100000000000005
         }
-      ]
+      ],
+      "explanation": {
+        "top_features_triggered": [
+          "ML Features Configured"
+        ],
+        "evidence_messages": [
+          "none"
+        ],
+        "soft_rules": [],
+        "hard_rule_triggered": null
+      }
     }
   }
 }

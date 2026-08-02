@@ -4,7 +4,7 @@ import json
 import time
 import asyncio
 import pandas as pd
-from typing import List
+from typing import Optional
 
 from orchestrator.context import PipelineContext
 from orchestrator.dag import DAGOrchestrator
@@ -38,7 +38,7 @@ def setup_pipeline(output_file: str) -> DAGOrchestrator:
     
     return orch
 
-async def process_batch(file_path: str, output_file: str, limit: int = None):
+async def process_batch(file_path: str, output_file: str, limit: Optional[int] = None):
     start = time.time()
     # Ensure fresh output
     if os.path.exists(output_file):
@@ -49,7 +49,7 @@ async def process_batch(file_path: str, output_file: str, limit: int = None):
     # Load dataset
     try:
         df = pd.read_csv(file_path)
-    except Exception as e:
+    except Exception:
         # Fallback to sample if primary missing in this test env
         df = pd.read_csv("dataset/sample_messages.csv")
         
@@ -64,7 +64,7 @@ async def process_batch(file_path: str, output_file: str, limit: int = None):
     
     for idx, row in df.iterrows():
         msg_id = str(row["message_id"])
-        payload = {k: v for k, v in row.to_dict().items() if pd.notnull(v)}
+        payload = {str(k): v for k, v in row.to_dict().items() if pd.notnull(v)}
         
         ctx = PipelineContext(message_id=msg_id, payload=payload)
         try:
@@ -88,7 +88,7 @@ async def process_batch(file_path: str, output_file: str, limit: int = None):
             failures += 1
             
     runtime = time.time() - start
-    print(f"\n--- M3.6 E2E Integration Run ---")
+    print("\n--- M3.6 E2E Integration Run ---")
     print(f"Total processed: {success + failures}")
     print(f"Success: {success}")
     print(f"Degraded: {degraded}")

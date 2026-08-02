@@ -4,16 +4,24 @@
   "trace": [
     {
       "stage": "FeatureExtractionStage",
-      "latency_ms": 0.00667572021484375,
+      "latency_ms": 0.02193450927734375,
       "status": "success",
       "retries": 0,
       "degraded": false,
       "outputs": {
         "conversation_type": "personal",
         "forwarded_count": 0,
-        "baseline_scam_risk": false,
+        "user_dnd_active": false,
+        "user_global_dismissal_rate": 0.14925373134328357,
         "urgency": "medium",
         "importance": "routine",
+        "scam_probability": 0.05,
+        "spam_probability": 0.1,
+        "requires_action": false,
+        "payment_related": false,
+        "event_related": false,
+        "personal_related": false,
+        "business_related": false,
         "safety": {
           "is_safe": true,
           "safety_reason": "Safety engine stub (M4 pending)",
@@ -24,47 +32,8 @@
       "error": null
     },
     {
-      "stage": "SafetyStage",
-      "latency_ms": 0.0016689300537109375,
-      "status": "success",
-      "retries": 0,
-      "degraded": false,
-      "outputs": {
-        "is_safe": true,
-        "safety_reason": "Safety engine stub (M4 pending)",
-        "safety_flags": []
-      },
-      "cache_hit": false,
-      "error": null
-    },
-    {
-      "stage": "RetrievalStage",
-      "latency_ms": 0.005245208740234375,
-      "status": "success",
-      "retries": 0,
-      "degraded": false,
-      "outputs": {
-        "evidence_message_ids": [
-          "none"
-        ],
-        "retrieval_confidence": 0.0,
-        "retrieval_reason": "No historical evidence found (Cold Start).",
-        "retrieval_metadata": {
-          "candidate_count": 0,
-          "filtered_count": 0,
-          "bm25_score": 0.0,
-          "embedding_score": 0.0,
-          "recency_score": 0.0,
-          "fusion_score": 0.0,
-          "rerank_score": 0.0
-        }
-      },
-      "cache_hit": false,
-      "error": null
-    },
-    {
       "stage": "NotificationIntelligenceStage",
-      "latency_ms": 0.095367431640625,
+      "latency_ms": 0.12278556823730469,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -148,8 +117,55 @@
       "error": null
     },
     {
+      "stage": "SafetyStage",
+      "latency_ms": 0.0016689300537109375,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "is_safe": true,
+        "safety_reason": "Safety engine stub (M4 pending)",
+        "safety_flags": []
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
+      "stage": "RetrievalStage",
+      "latency_ms": 2.021312713623047,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "evidence_message_ids": [
+          "message_0299"
+        ],
+        "retrieval_confidence": 0.7659021013076992,
+        "retrieval_reason": "High relevance semantic match. Score exceeded adaptive threshold 0.50",
+        "retrieval_metadata": {
+          "candidate_count": 5,
+          "filtered_count": 1,
+          "bm25_score": 1.0,
+          "embedding_score": 0.7448922395706177,
+          "recency_score": 0.6794520547945205,
+          "fusion_score": 0.7659021013076992,
+          "rerank_score": 0.0,
+          "evidence_list": [
+            {
+              "message_id": "message_0299",
+              "message_text": "When did a trip last change something about how you see yourself?\n\nLadakh is built for that. 7 nights, all in, from Rs 17,999 per person.\n\nTap below to view the itinerary.\n\nReply STOP to unsubscribe from marketing messages.",
+              "similarity": 0.7448922395706177,
+              "retrieval_score": 0.7659021013076992
+            }
+          ]
+        }
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
       "stage": "DecisionStage",
-      "latency_ms": 0.15115737915039062,
+      "latency_ms": 18.77903938293457,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -159,14 +175,14 @@
           "action": "digest",
           "message_type": "personal",
           "reason": "Digest: Low priority personal update, saved for later.",
-          "confidence": 0.5,
+          "confidence": 0.21809999999999996,
           "evidence_message_ids": "none"
         },
         "decision_trace": {
           "message_id": "msg_089",
           "steps": [
             {
-              "step": "deterministic_policy",
+              "step": "hard_policy",
               "matched": false
             },
             {
@@ -178,15 +194,25 @@
               "raw_decision": {
                 "action": "digest",
                 "message_type": "personal",
-                "llm_confidence": 0.8
+                "llm_confidence": 0.36349999999999993
               }
             },
             {
               "step": "final_output",
               "action": "digest",
-              "confidence": 0.5
+              "confidence": 0.21809999999999996
             }
-          ]
+          ],
+          "explanation": {
+            "top_features_triggered": [
+              "ML Features Configured"
+            ],
+            "evidence_messages": [
+              "none"
+            ],
+            "soft_rules": [],
+            "hard_rule_triggered": null
+          }
         }
       },
       "cache_hit": false,
@@ -194,7 +220,7 @@
     },
     {
       "stage": "SerializationStage",
-      "latency_ms": 0.22673606872558594,
+      "latency_ms": 0.01049041748046875,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -209,14 +235,14 @@
       "action": "digest",
       "message_type": "personal",
       "reason": "Digest: Low priority personal update, saved for later.",
-      "confidence": 0.5,
+      "confidence": 0.21809999999999996,
       "evidence_message_ids": "none"
     },
     "decision_trace": {
       "message_id": "msg_089",
       "steps": [
         {
-          "step": "deterministic_policy",
+          "step": "hard_policy",
           "matched": false
         },
         {
@@ -228,15 +254,25 @@
           "raw_decision": {
             "action": "digest",
             "message_type": "personal",
-            "llm_confidence": 0.8
+            "llm_confidence": 0.36349999999999993
           }
         },
         {
           "step": "final_output",
           "action": "digest",
-          "confidence": 0.5
+          "confidence": 0.21809999999999996
         }
-      ]
+      ],
+      "explanation": {
+        "top_features_triggered": [
+          "ML Features Configured"
+        ],
+        "evidence_messages": [
+          "none"
+        ],
+        "soft_rules": [],
+        "hard_rule_triggered": null
+      }
     }
   }
 }

@@ -1,7 +1,6 @@
 import os
 import sys
 import time
-import cProfile
 import tracemalloc
 import pandas as pd
 

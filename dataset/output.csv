@@ -1,111 +1,111 @@
 message_id,action,message_type,reason,confidence,evidence_message_ids
-msg_023,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_091,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_090,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_048,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_040,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_075,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_005,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_104,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_069,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_107,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_070,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_003,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_099,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_008,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_092,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_060,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_004,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_030,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_045,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_052,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_009,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_071,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_016,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_065,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_038,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_086,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_014,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_094,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_029,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_105,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_002,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_010,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_078,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_013,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_018,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_044,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_032,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_106,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_006,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_109,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_108,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_019,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_088,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_056,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_027,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_050,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_083,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_063,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_033,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_061,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_020,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_017,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_058,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_026,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_047,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_046,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_042,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_079,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_098,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_037,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_007,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_085,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_001,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_021,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_028,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_012,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_064,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_103,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_031,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_057,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_087,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_067,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_039,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_082,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_066,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_049,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_015,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_051,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_097,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_089,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_053,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_059,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_024,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_072,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_036,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_076,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_055,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_102,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_080,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_093,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_034,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_035,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_101,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_041,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_011,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_110,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_095,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_074,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_073,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_054,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_068,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_100,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_062,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_096,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_043,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_077,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_081,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_025,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_084,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
-msg_022,digest,personal,"Digest: Low priority personal update, saved for later.",0.5,none
+msg_023,digest,event,"Digest: Low priority event update, saved for later.",0.3732142857142857,none
+msg_091,mute,scam,Mute: System assessed as scam.,0.4643571428571428,none
+msg_090,digest,personal,"Digest: Low priority personal update, saved for later.",0.31595714285714277,none
+msg_048,digest,scam,"Digest: Low priority scam update, saved for later.",0.3092142857142857,none
+msg_040,mute,group_chat,Deterministic match: User has muted this group.,1.0,none
+msg_075,digest,event,"Digest: Low priority event update, saved for later.",0.3438571428571429,none
+msg_005,digest,personal,"Digest: Low priority personal update, saved for later.",0.26008571428571425,none
+msg_104,digest,personal,"Digest: Low priority personal update, saved for later.",0.31418571428571423,none
+msg_069,mute,group_chat,Deterministic match: User has muted this group.,1.0,none
+msg_107,digest,scam,"Digest: Low priority scam update, saved for later.",0.24378571428571427,none
+msg_070,digest,personal,Deterministic match: User has DND active.,1.0,none
+msg_003,notify,business_update,Notify: System assessed as business_update.,0.4160000000000001,none
+msg_099,digest,personal,"Digest: Low priority personal update, saved for later.",0.26699999999999996,none
+msg_008,digest,personal,Deterministic match: User has DND active.,1.0,none
+msg_092,digest,event,"Digest: Low priority event update, saved for later.",0.3945000000000001,none
+msg_060,digest,personal,"Digest: Low priority personal update, saved for later.",0.26507142857142857,none
+msg_004,notify,event,Notify: System assessed as event.,0.5149999999999999,none
+msg_030,mute,group_chat,Deterministic match: User has muted this group.,1.0,none
+msg_045,digest,event,"Digest: Low priority event update, saved for later.",0.23278571428571432,none
+msg_052,digest,event,"Digest: Low priority event update, saved for later.",0.24099999999999996,none
+msg_009,mute,group_chat,Deterministic match: User has muted this group.,1.0,none
+msg_071,digest,personal,"Digest: Low priority personal update, saved for later.",0.2635214285714285,none
+msg_016,digest,personal,Deterministic match: User has DND active.,1.0,none
+msg_065,digest,promotion,"Digest: Low priority promotion update, saved for later.",0.27549999999999997,none
+msg_038,digest,urgent,"Digest: Low priority urgent update, saved for later.",0.3232857142857143,none
+msg_086,digest,personal,"Digest: Low priority personal update, saved for later.",0.23009285714285707,none
+msg_014,mute,spam,Deterministic match: User opted out of promotions from this business.,1.0,none
+msg_094,digest,business_update,"Digest: Low priority business_update update, saved for later.",0.29128571428571426,none
+msg_029,digest,promotion,"Digest: Low priority promotion update, saved for later.",0.3301428571428572,none
+msg_105,digest,personal,"Digest: Low priority personal update, saved for later.",0.27598571428571433,none
+msg_002,digest,personal,"Digest: Low priority personal update, saved for later.",0.30600000000000005,none
+msg_010,digest,business_update,"Digest: Low priority business_update update, saved for later.",0.4714999999999999,none
+msg_078,mute,group_chat,Deterministic match: User has muted this group.,1.0,none
+msg_013,digest,personal,"Digest: Low priority personal update, saved for later.",0.26815714285714276,none
+msg_018,digest,personal,"Digest: Low priority personal update, saved for later.",0.22314285714285712,none
+msg_044,digest,scam,"Digest: Low priority scam update, saved for later.",0.3117142857142858,none
+msg_032,digest,urgent,"Digest: Low priority urgent update, saved for later.",0.2760714285714285,none
+msg_106,digest,personal,"Digest: Low priority personal update, saved for later.",0.25581428571428566,none
+msg_006,digest,event,"Digest: Low priority event update, saved for later.",0.2257571428571429,none
+msg_109,digest,urgent,"Digest: Low priority urgent update, saved for later.",0.285,none
+msg_108,digest,personal,"Digest: Low priority personal update, saved for later.",0.25159999999999993,none
+msg_019,digest,event,"Digest: Low priority event update, saved for later.",0.268,none
+msg_088,mute,group_chat,Deterministic match: User has muted this group.,1.0,none
+msg_056,mute,group_chat,Deterministic match: User has muted this group.,1.0,none
+msg_027,digest,promotion,"Digest: Low priority promotion update, saved for later.",0.4815,none
+msg_050,notify,event,Notify: System assessed as event.,0.5149999999999999,none
+msg_083,digest,personal,"Digest: Low priority personal update, saved for later.",0.23009285714285707,none
+msg_063,digest,urgent,"Digest: Low priority urgent update, saved for later.",0.3342142857142857,none
+msg_033,digest,personal,"Digest: Low priority personal update, saved for later.",0.3948857142857143,none
+msg_061,mute,group_chat,Deterministic match: User has muted this group.,1.0,none
+msg_020,digest,personal,"Digest: Low priority personal update, saved for later.",0.3307714285714286,none
+msg_017,mute,group_chat,Deterministic match: User has muted this group.,1.0,none
+msg_058,mute,group_chat,Deterministic match: User has muted this group.,1.0,none
+msg_026,digest,promotion,"Digest: Low priority promotion update, saved for later.",0.25239999999999996,none
+msg_047,digest,personal,"Digest: Low priority personal update, saved for later.",0.21433571428571427,none
+msg_046,digest,event,"Digest: Low priority event update, saved for later.",0.259,none
+msg_042,digest,urgent,"Digest: Low priority urgent update, saved for later.",0.23432142857142851,none
+msg_079,digest,personal,"Digest: Low priority personal update, saved for later.",0.21787857142857142,none
+msg_098,digest,personal,"Digest: Low priority personal update, saved for later.",0.248,none
+msg_037,digest,personal,"Digest: Low priority personal update, saved for later.",0.23609285714285708,none
+msg_007,digest,event,"Digest: Low priority event update, saved for later.",0.3295,none
+msg_085,digest,personal,Deterministic match: User has DND active.,1.0,none
+msg_001,digest,urgent,"Digest: Low priority urgent update, saved for later.",0.23249999999999998,none
+msg_021,digest,personal,"Digest: Low priority personal update, saved for later.",0.2277142857142857,none
+msg_028,mute,spam,Deterministic match: User opted out of promotions from this business.,1.0,none
+msg_012,digest,personal,"Digest: Low priority personal update, saved for later.",0.25137142857142863,none
+msg_064,digest,personal,"Digest: Low priority personal update, saved for later.",0.21224285714285718,none
+msg_103,digest,personal,"Digest: Low priority personal update, saved for later.",0.31418571428571423,none
+msg_031,digest,event,"Digest: Low priority event update, saved for later.",0.24549999999999997,none
+msg_057,digest,event,"Digest: Low priority event update, saved for later.",0.37100000000000005,none
+msg_087,mute,group_chat,Deterministic match: User has muted this group.,1.0,none
+msg_067,digest,personal,"Digest: Low priority personal update, saved for later.",0.2515214285714285,none
+msg_039,digest,event,"Digest: Low priority event update, saved for later.",0.2945,none
+msg_082,digest,personal,"Digest: Low priority personal update, saved for later.",0.23009285714285707,none
+msg_066,mute,spam,Deterministic match: User opted out of promotions from this business.,1.0,none
+msg_049,digest,business_update,"Digest: Low priority business_update update, saved for later.",0.2868071428571428,none
+msg_015,digest,personal,"Digest: Low priority personal update, saved for later.",0.20625714285714283,none
+msg_051,mute,spam,Deterministic match: User opted out of promotions from this business.,1.0,none
+msg_097,digest,personal,"Digest: Low priority personal update, saved for later.",0.5378571428571429,none
+msg_089,digest,personal,"Digest: Low priority personal update, saved for later.",0.21809999999999996,none
+msg_053,digest,personal,"Digest: Low priority personal update, saved for later.",0.2665571428571428,none
+msg_059,digest,personal,"Digest: Low priority personal update, saved for later.",0.27678571428571425,none
+msg_024,mute,spam,Deterministic match: User opted out of promotions from this business.,1.0,none
+msg_072,digest,personal,"Digest: Low priority personal update, saved for later.",0.2133714285714285,none
+msg_036,digest,event,"Digest: Low priority event update, saved for later.",0.30647142857142856,none
+msg_076,digest,event,"Digest: Low priority event update, saved for later.",0.24099999999999996,none
+msg_055,digest,personal,"Digest: Low priority personal update, saved for later.",0.3627714285714285,none
+msg_102,digest,urgent,"Digest: Low priority urgent update, saved for later.",0.2565,none
+msg_080,digest,personal,"Digest: Low priority personal update, saved for later.",0.24909285714285706,none
+msg_093,digest,personal,Deterministic match: User has DND active.,1.0,none
+msg_034,mute,group_chat,Deterministic match: User has muted this group.,1.0,none
+msg_035,digest,personal,"Digest: Low priority personal update, saved for later.",0.2333857142857142,none
+msg_101,digest,personal,Deterministic match: User has DND active.,1.0,none
+msg_041,digest,personal,"Digest: Low priority personal update, saved for later.",0.27075714285714286,none
+msg_011,mute,group_chat,Deterministic match: User has muted this group.,1.0,none
+msg_110,mute,scam,Mute: System assessed as scam.,0.4406428571428571,none
+msg_095,digest,urgent,"Digest: Low priority urgent update, saved for later.",0.2463214285714285,none
+msg_074,mute,group_chat,Deterministic match: User has muted this group.,1.0,none
+msg_073,digest,personal,"Digest: Low priority personal update, saved for later.",0.34583571428571425,none
+msg_054,digest,personal,"Digest: Low priority personal update, saved for later.",0.27002857142857145,none
+msg_068,digest,personal,"Digest: Low priority personal update, saved for later.",0.23952142857142855,none
+msg_100,digest,urgent,"Digest: Low priority urgent update, saved for later.",0.38050000000000006,none
+msg_062,digest,personal,Deterministic match: User has DND active.,1.0,none
+msg_096,digest,personal,"Digest: Low priority personal update, saved for later.",0.23009285714285707,none
+msg_043,digest,urgent,"Digest: Low priority urgent update, saved for later.",0.2269,none
+msg_077,digest,personal,Deterministic match: User has DND active.,1.0,none
+msg_081,digest,personal,"Digest: Low priority personal update, saved for later.",0.23009285714285707,none
+msg_025,notify,business_update,Notify: System assessed as business_update.,0.4160000000000001,none
+msg_084,mute,spam,Deterministic match: User opted out of promotions from this business.,1.0,none
+msg_022,digest,personal,"Digest: Low priority personal update, saved for later.",0.2368142857142857,none

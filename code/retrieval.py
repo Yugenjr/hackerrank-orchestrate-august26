@@ -2,14 +2,13 @@
 Hybrid Embedding & Retrieval Pipeline
 Implements FAISS + BM25 + Recency + Reranking + Clustering.
 """
-import os
 import math
 import logging
+import hashlib
 import numpy as np
 from datetime import datetime
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Tuple, Optional
 
-import faiss
 from rank_bm25 import BM25Okapi
 from sentence_transformers import SentenceTransformer, CrossEncoder
 from sklearn.cluster import DBSCAN
@@ -29,6 +28,28 @@ class DummyModel:
         
     def predict(self, pairs, **kwargs):
         return np.random.rand(len(pairs)).astype(np.float32)
+        
+    def get_sentence_embedding_dimension(self) -> int:
+        return 384
+        
+    def get_embedding_dimension(self) -> int:
+        return 384
+
+class EmbeddingStore:
+    """Singleton-like cache for embeddings keyed by SHA-256."""
+    _cache: Dict[str, np.ndarray] = {}
+    
+    @classmethod
+    def get_key(cls, text: str) -> str:
+        return hashlib.sha256(text.encode('utf-8')).hexdigest()
+        
+    @classmethod
+    def get(cls, text: str) -> Optional[np.ndarray]:
+        return cls._cache.get(cls.get_key(text))
+        
+    @classmethod
+    def put(cls, text: str, embedding: np.ndarray):
+        cls._cache[cls.get_key(text)] = embedding
 
 class RetrievalEngine:
     def __init__(self, data_loader: DataLoader, use_mocks: bool = False):
@@ -39,16 +60,22 @@ class RetrievalEngine:
         logger.info("Initializing Retrieval Engine models...")
         if use_mocks:
             self.bi_encoder = DummyModel()
-            self.cross_encoder = DummyModel()
+            if getattr(self.config, 'USE_CROSS_ENCODER', False):
+                self.cross_encoder = DummyModel()
             self.embed_dim = 384
         else:
             # Using fast lightweight models for hackathon constraints
             self.bi_encoder = SentenceTransformer("all-MiniLM-L6-v2")
-            self.cross_encoder = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
-            self.embed_dim = self.bi_encoder.get_sentence_embedding_dimension()
+            if getattr(self.config, 'USE_CROSS_ENCODER', False):
+                self.cross_encoder = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+            # SentenceTransformer dimensions
+            try:
+                self.embed_dim = self.bi_encoder.get_sentence_embedding_dimension()
+            except Exception:
+                self.embed_dim = self.bi_encoder.get_embedding_dimension()
             
         # Caches
-        self.embedding_cache: Dict[str, np.ndarray] = {}
+        self.bm25_cache: Dict[str, BM25Okapi] = {}
         
         # Pre-build history index for O(1) isolation by user_id
         self.user_to_msgs: Dict[str, List[Dict[str, Any]]] = {}
@@ -74,33 +101,39 @@ class RetrievalEngine:
             if gid and gid.lower() != "nan":
                 self.group_to_msgs.setdefault(gid, []).append(row_w_id)
 
-    def _get_candidates(self, msg_row: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Stage 1: Deterministic Filtering & Cold-Start Fallbacks."""
+    def _get_candidates_unfiltered(self, msg_row: Dict[str, Any]) -> Tuple[str, List[Dict[str, Any]]]:
+        """Stage 1: Deterministic Filtering & Cold-Start Fallbacks. Returns cache key and candidates."""
         uid = str(msg_row.get("user_id", ""))
         ctype = str(msg_row.get("conversation_type", ""))
         
         candidates = self.user_to_msgs.get(uid, [])
+        cache_key = f"user_{uid}"
         
         # Cold start fallback logic
         if not candidates:
-            logger.debug(f"Cold start for user {uid}, applying fallback.")
             if ctype == "business":
                 bid = str(msg_row.get("business_id", ""))
                 candidates = self.business_to_msgs.get(bid, [])
+                cache_key = f"business_{bid}"
             elif ctype == "group":
                 gid = str(msg_row.get("group_id", ""))
                 candidates = self.group_to_msgs.get(gid, [])
+                cache_key = f"group_{gid}"
                 
-        # Time constraints and self-exclusion
+        return cache_key, candidates
+
+    def _get_candidates(self, msg_row: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Returns the filtered candidates list (used for unit tests / backward compatibility)."""
+        _, all_cands = self._get_candidates_unfiltered(msg_row)
         current_msg_id = str(msg_row.get("message_id", ""))
+        ctype = msg_row.get("conversation_type", "personal")
         filtered = []
-        for c in candidates:
+        for c in all_cands:
             if str(c.get("message_id")) == current_msg_id:
                 continue
             if ctype == "business" and str(c.get("business_id", "")) != str(msg_row.get("business_id", "")):
                 continue
             filtered.append(c)
-            
         return filtered
 
     def _get_text_payload(self, row: Dict[str, Any]) -> str:
@@ -110,11 +143,27 @@ class RetrievalEngine:
         parts = [p for p in (text, ocr, asr) if p and p.lower() != "nan"]
         return " ".join(parts)
 
-    def _get_embedding(self, text: str) -> np.ndarray:
-        if text not in self.embedding_cache:
-            emb = self.bi_encoder.encode(text)
-            self.embedding_cache[text] = emb
-        return self.embedding_cache[text]
+    def _get_embeddings_batched(self, texts: List[str]) -> np.ndarray:
+        results: List[Any] = []
+        missing_indices: List[int] = []
+        missing_texts: List[str] = []
+        
+        for i, text in enumerate(texts):
+            emb = EmbeddingStore.get(text)
+            if emb is not None:
+                results.append(emb)
+            else:
+                results.append(None)
+                missing_indices.append(i)
+                missing_texts.append(text)
+                
+        if missing_texts:
+            new_embs = self.bi_encoder.encode(missing_texts)
+            for idx, text, emb in zip(missing_indices, missing_texts, new_embs):
+                results[idx] = emb
+                EmbeddingStore.put(text, emb)
+                
+        return np.array(results)
 
     def _compute_recency_and_decay(self, hist_date_str: str, query_date_str: str) -> Tuple[float, float]:
         """Calculates independent recency score [0-1] and exponential temporal decay multiplier."""
@@ -141,8 +190,6 @@ class RetrievalEngine:
         if len(candidates) <= 1:
             return candidates
             
-        # DBSCAN clustering based on embedding distance (cosine similarity distance mapping)
-        # Using inner product requires normalization, assuming embeddings are L2 normalized (SentenceTransformers default)
         clustering = DBSCAN(eps=self.config.CLUSTER_EPS, min_samples=self.config.CLUSTER_MIN_SAMPLES, metric="cosine")
         labels = clustering.fit_predict(embeddings)
         
@@ -167,56 +214,76 @@ class RetrievalEngine:
             "embedding_score": 0.0,
             "recency_score": 0.0,
             "fusion_score": 0.0,
-            "rerank_score": 0.0
+            "rerank_score": 0.0,
+            "evidence_list": []
         }
         
-        # Stage 1: Candidate Filtering
-        candidates = self._get_candidates(msg_row)
-        meta["candidate_count"] = len(candidates)
+        empty_retrieval = {
+            "evidence_message_ids": ["none"],
+            "retrieval_confidence": 0.0,
+            "retrieval_reason": "No historical evidence found.",
+            "retrieval_metadata": meta
+        }
         
-        if not candidates:
-            return {
-                "evidence_message_ids": ["none"],
-                "retrieval_confidence": 0.0,
-                "retrieval_reason": "No historical evidence found (Cold Start).",
-                "retrieval_metadata": meta
-            }
+        # Stage 1: Candidate Retrieval & Caching BM25
+        cache_key, all_user_candidates = self._get_candidates_unfiltered(msg_row)
+        meta["candidate_count"] = 0
+        
+        if not all_user_candidates:
+            return empty_retrieval
 
         query_raw = self._get_text_payload(msg_row)
-        
-        # Stage 2: Query Normalization
         query_norm = QueryExpander.normalize(query_raw)
         query_date = str(msg_row.get("created_at", ""))
         
+        # Stage 2: BM25 Scoring on UNFILTERED candidates
+        if cache_key not in self.bm25_cache:
+            unfiltered_texts = [self._get_text_payload(c) for c in all_user_candidates]
+            unfiltered_norms = [QueryExpander.normalize(t) for t in unfiltered_texts]
+            tokenized_corpus = [doc.split(" ") for doc in unfiltered_norms]
+            self.bm25_cache[cache_key] = BM25Okapi(tokenized_corpus)
+            
+        bm25 = self.bm25_cache[cache_key]
+        raw_bm25_scores = bm25.get_scores(query_norm.split(" "))
+        
+        # Now filter out the current message
+        current_msg_id = str(msg_row.get("message_id", ""))
+        ctype = msg_row.get("conversation_type", "personal")
+        
+        candidates = []
+        bm25_scores = []
+        for c, score in zip(all_user_candidates, raw_bm25_scores):
+            if str(c.get("message_id")) == current_msg_id:
+                continue
+            if ctype == "business" and str(c.get("business_id", "")) != str(msg_row.get("business_id", "")):
+                continue
+            candidates.append(c)
+            bm25_scores.append(score)
+            
+        meta["candidate_count"] = len(candidates)
+        if not candidates:
+            return empty_retrieval
+            
+        bm25_arr = np.array(bm25_scores)
+        if len(bm25_arr) > 0 and max(bm25_arr) > 0:
+            bm25_arr = bm25_arr / max(bm25_arr) # Normalize 0-1
+            
         candidate_texts = [self._get_text_payload(c) for c in candidates]
         candidate_norms = [QueryExpander.normalize(t) for t in candidate_texts]
-        
-        # BM25 Scoring
-        tokenized_corpus = [doc.split(" ") for doc in candidate_norms]
-        bm25 = BM25Okapi(tokenized_corpus)
-        bm25_scores = bm25.get_scores(query_norm.split(" "))
-        
-        if len(bm25_scores) > 0 and max(bm25_scores) > 0:
-            bm25_scores = bm25_scores / max(bm25_scores) # Normalize 0-1
             
-        # Stage 3: Dense Retrieval (FAISS L2/IP)
-        query_emb = self._get_embedding(query_norm)
-        cand_embs = np.array([self._get_embedding(t) for t in candidate_norms])
+        # Stage 3: Dense Retrieval (Optimized Cosine Similarity)
+        query_emb = self._get_embeddings_batched([query_norm])[0]
+        cand_embs = self._get_embeddings_batched(candidate_norms)
         
-        # Inner product for cosine sim (sentence transformers are normalized)
-        faiss.normalize_L2(cand_embs)
-        query_emb_2d = np.expand_dims(query_emb, axis=0)
-        faiss.normalize_L2(query_emb_2d)
+        # Vectorized cosine similarity via NumPy
+        cand_norms = np.linalg.norm(cand_embs, axis=1, keepdims=True)
+        cand_norms[cand_norms == 0] = 1.0
+        normalized_cands = cand_embs / cand_norms
         
-        index = faiss.IndexFlatIP(self.embed_dim)
-        index.add(cand_embs)
+        q_norm = np.linalg.norm(query_emb)
+        normalized_q = query_emb / (q_norm if q_norm > 0 else 1.0)
         
-        # Search all to get scores aligned with indices
-        faiss_scores, faiss_indices = index.search(query_emb_2d, len(candidates))
-        # Re-align faiss scores to original candidate indices
-        aligned_faiss = np.zeros(len(candidates))
-        for rank, idx in enumerate(faiss_indices[0]):
-            aligned_faiss[idx] = faiss_scores[0][rank]
+        aligned_faiss = np.dot(normalized_cands, normalized_q)
 
         # Stage 4: Fusion & Decay
         fusion_scores = []
@@ -228,7 +295,7 @@ class RetrievalEngine:
             recency, decay = self._compute_recency_and_decay(str(c.get("created_at", "")), query_date)
             
             raw_fusion = (
-                (weights["bm25"] * bm25_scores[i]) +
+                (weights["bm25"] * bm25_arr[i]) +
                 (weights["faiss"] * aligned_faiss[i]) +
                 (weights["relationship"] * rel_score) +
                 (weights["trust"] * trust_score) +
@@ -246,32 +313,42 @@ class RetrievalEngine:
         clustered_cands = self._cluster_deduplicate(top_k_candidates, top_k_embs)
         meta["filtered_count"] = len(candidates) - len(clustered_cands)
         
-        # Reranking (Cross-Encoder)
         if not clustered_cands:
-            return {"evidence_message_ids": ["none"], "retrieval_confidence": 0.0, "retrieval_reason": "All filtered", "retrieval_metadata": meta}
+            empty_retrieval["retrieval_reason"] = "All filtered"
+            return empty_retrieval
             
-        rerank_pairs = [[query_norm, QueryExpander.normalize(self._get_text_payload(c))] for c in clustered_cands]
-        rerank_scores = self.cross_encoder.predict(rerank_pairs)
-        
-        # Map to sigmoid 0-1 if ms-marco (which outputs logits)
-        if not self.use_mocks:
-            rerank_scores = 1 / (1 + np.exp(-rerank_scores))
+        # Reranking (Cross-Encoder)
+        use_ce = getattr(self.config, 'USE_CROSS_ENCODER', False)
+        if use_ce and hasattr(self, 'cross_encoder'):
+            rerank_pairs = [[query_norm, QueryExpander.normalize(self._get_text_payload(c))] for c in clustered_cands]
+            rerank_scores = self.cross_encoder.predict(rerank_pairs)
+            if not self.use_mocks:
+                rerank_scores = 1 / (1 + np.exp(-rerank_scores))
+            # Sort clustered_cands by rerank score
+            sorted_by_rerank = sorted(zip(rerank_scores, clustered_cands), key=lambda x: x[0], reverse=True)
+            best_cand = sorted_by_rerank[0][1]
+            meta["rerank_score"] = float(sorted_by_rerank[0][0])
+        else:
+            best_cand = clustered_cands[0]
+            meta["rerank_score"] = 0.0
             
-        # Bypassing cross-encoder for the final score and candidate selection because it squashes WhatsApp text logits to zero.
-        best_idx = 0  # clustered_cands is ordered by fusion score
-        best_cand = clustered_cands[best_idx]
-        
-        # Extract fusion score
         best_orig_idx = candidates.index(best_cand)
         best_score = float([fs for fs, i, _ in fusion_scores if i == best_orig_idx][0])
         
-        # Retrieve Original Fusion metrics for observability
-        best_orig_idx = candidates.index(best_cand)
-        meta["bm25_score"] = float(bm25_scores[best_orig_idx])
+        meta["bm25_score"] = float(bm25_arr[best_orig_idx])
         meta["embedding_score"] = float(aligned_faiss[best_orig_idx])
         meta["fusion_score"] = best_score
         meta["recency_score"] = float([rs for _, i, rs in fusion_scores if i == best_orig_idx][0])
-        meta["rerank_score"] = float(rerank_scores[best_idx]) if len(rerank_scores) > 0 else 0.0
+        
+        # Populate structured evidence
+        evidence_list = []
+        evidence_list.append({
+            "message_id": str(best_cand["message_id"]),
+            "message_text": self._get_text_payload(best_cand),
+            "similarity": float(aligned_faiss[best_orig_idx]),
+            "retrieval_score": best_score
+        })
+        meta["evidence_list"] = evidence_list
         
         # Stage 6: Adaptive Thresholding
         threshold = self.config.BASE_CONFIDENCE_THRESHOLD

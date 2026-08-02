@@ -10,8 +10,8 @@ class ReasonGenerator:
         # If an LLM-provided reason exists, validate it
         reason = llm_reason if llm_reason else ""
         
-        # If reason is missing, too long, or clearly hallucinating generic placeholders
-        if not reason or len(reason) > 150 or "[Insert" in reason:
+        # If reason is missing, or clearly hallucinating generic placeholders
+        if not reason or "[Insert" in reason:
             # Fallback to deterministic generation to prevent hallucination
             if action == "mute" and message_type == "spam":
                 reason = "Muted: High-risk spam indicators detected."

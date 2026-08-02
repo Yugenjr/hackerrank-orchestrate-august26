@@ -4,16 +4,30 @@
   "trace": [
     {
       "stage": "FeatureExtractionStage",
-      "latency_ms": 0.009775161743164062,
+      "latency_ms": 0.024557113647460938,
       "status": "success",
       "retries": 0,
       "degraded": false,
       "outputs": {
         "conversation_type": "business",
         "forwarded_count": 3,
+        "user_dnd_active": false,
+        "user_global_dismissal_rate": 0.6071428571428571,
+        "business_trust_score": 1.0,
+        "business_verified": true,
+        "business_high_reports": false,
         "baseline_scam_risk": false,
+        "business_promotions_opted_out": true,
+        "business_interaction_strength": 0.0,
         "urgency": "medium",
         "importance": "notable",
+        "scam_probability": 0.05,
+        "spam_probability": 0.9,
+        "requires_action": false,
+        "payment_related": false,
+        "event_related": false,
+        "personal_related": false,
+        "business_related": true,
         "safety": {
           "is_safe": true,
           "safety_reason": "Safety engine stub (M4 pending)",
@@ -24,47 +38,8 @@
       "error": null
     },
     {
-      "stage": "SafetyStage",
-      "latency_ms": 0.0011920928955078125,
-      "status": "success",
-      "retries": 0,
-      "degraded": false,
-      "outputs": {
-        "is_safe": true,
-        "safety_reason": "Safety engine stub (M4 pending)",
-        "safety_flags": []
-      },
-      "cache_hit": false,
-      "error": null
-    },
-    {
-      "stage": "RetrievalStage",
-      "latency_ms": 0.0057220458984375,
-      "status": "success",
-      "retries": 0,
-      "degraded": false,
-      "outputs": {
-        "evidence_message_ids": [
-          "none"
-        ],
-        "retrieval_confidence": 0.0,
-        "retrieval_reason": "No historical evidence found (Cold Start).",
-        "retrieval_metadata": {
-          "candidate_count": 0,
-          "filtered_count": 0,
-          "bm25_score": 0.0,
-          "embedding_score": 0.0,
-          "recency_score": 0.0,
-          "fusion_score": 0.0,
-          "rerank_score": 0.0
-        }
-      },
-      "cache_hit": false,
-      "error": null
-    },
-    {
       "stage": "NotificationIntelligenceStage",
-      "latency_ms": 0.10037422180175781,
+      "latency_ms": 0.10156631469726562,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -148,43 +123,45 @@
       "error": null
     },
     {
-      "stage": "DecisionStage",
-      "latency_ms": 0.16164779663085938,
+      "stage": "SafetyStage",
+      "latency_ms": 0.00095367431640625,
       "status": "success",
       "retries": 0,
       "degraded": false,
       "outputs": {
-        "decision": {
-          "message_id": "msg_066",
-          "action": "digest",
-          "message_type": "personal",
-          "reason": "Digest: Low priority personal update, saved for later.",
-          "confidence": 0.5,
-          "evidence_message_ids": "none"
-        },
-        "decision_trace": {
-          "message_id": "msg_066",
-          "steps": [
+        "is_safe": true,
+        "safety_reason": "Safety engine stub (M4 pending)",
+        "safety_flags": []
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
+      "stage": "RetrievalStage",
+      "latency_ms": 1.4851093292236328,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "evidence_message_ids": [
+          "message_0188"
+        ],
+        "retrieval_confidence": 0.7831952369376405,
+        "retrieval_reason": "High relevance semantic match. Score exceeded adaptive threshold 0.50",
+        "retrieval_metadata": {
+          "candidate_count": 2,
+          "filtered_count": 0,
+          "bm25_score": 1.0,
+          "embedding_score": 0.7525086402893066,
+          "recency_score": 0.821917808219178,
+          "fusion_score": 0.7831952369376405,
+          "rerank_score": 0.0,
+          "evidence_list": [
             {
-              "step": "deterministic_policy",
-              "matched": false
-            },
-            {
-              "step": "safety_check",
-              "is_safe": true
-            },
-            {
-              "step": "llm_router",
-              "raw_decision": {
-                "action": "digest",
-                "message_type": "personal",
-                "llm_confidence": 0.8
-              }
-            },
-            {
-              "step": "final_output",
-              "action": "digest",
-              "confidence": 0.5
+              "message_id": "message_0188",
+              "message_text": "Target promotion reminder: selected home and travel items are discounted this weekend.",
+              "similarity": 0.7525086402893066,
+              "retrieval_score": 0.7831952369376405
             }
           ]
         }
@@ -193,8 +170,46 @@
       "error": null
     },
     {
+      "stage": "DecisionStage",
+      "latency_ms": 0.3476142883300781,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "decision": {
+          "message_id": "msg_066",
+          "action": "mute",
+          "message_type": "spam",
+          "reason": "Deterministic match: User opted out of promotions from this business.",
+          "confidence": 1.0,
+          "evidence_message_ids": "none"
+        },
+        "decision_trace": {
+          "message_id": "msg_066",
+          "steps": [
+            {
+              "step": "hard_policy",
+              "matched": true,
+              "action": "mute",
+              "rule_reason": "Deterministic match: User opted out of promotions from this business."
+            }
+          ],
+          "explanation": {
+            "top_features_triggered": [],
+            "evidence_messages": [
+              "none"
+            ],
+            "soft_rules": [],
+            "hard_rule_triggered": "Deterministic match: User opted out of promotions from this business."
+          }
+        }
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
       "stage": "SerializationStage",
-      "latency_ms": 0.25653839111328125,
+      "latency_ms": 0.019788742065429688,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -206,37 +221,30 @@
   "decision": {
     "decision": {
       "message_id": "msg_066",
-      "action": "digest",
-      "message_type": "personal",
-      "reason": "Digest: Low priority personal update, saved for later.",
-      "confidence": 0.5,
+      "action": "mute",
+      "message_type": "spam",
+      "reason": "Deterministic match: User opted out of promotions from this business.",
+      "confidence": 1.0,
       "evidence_message_ids": "none"
     },
     "decision_trace": {
       "message_id": "msg_066",
       "steps": [
         {
-          "step": "deterministic_policy",
-          "matched": false
-        },
-        {
-          "step": "safety_check",
-          "is_safe": true
-        },
-        {
-          "step": "llm_router",
-          "raw_decision": {
-            "action": "digest",
-            "message_type": "personal",
-            "llm_confidence": 0.8
-          }
-        },
-        {
-          "step": "final_output",
-          "action": "digest",
-          "confidence": 0.5
+          "step": "hard_policy",
+          "matched": true,
+          "action": "mute",
+          "rule_reason": "Deterministic match: User opted out of promotions from this business."
         }
-      ]
+      ],
+      "explanation": {
+        "top_features_triggered": [],
+        "evidence_messages": [
+          "none"
+        ],
+        "soft_rules": [],
+        "hard_rule_triggered": "Deterministic match: User opted out of promotions from this business."
+      }
     }
   }
 }

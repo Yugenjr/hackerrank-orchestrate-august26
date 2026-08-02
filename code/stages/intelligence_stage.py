@@ -1,6 +1,5 @@
 import os
 import sys
-from typing import Any
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from orchestrator.stage import PipelineStage
@@ -27,13 +26,16 @@ class NotificationIntelligenceStage(PipelineStage):
         """
         row = context.payload
         text = str(row.get("message_text", ""))
-        if text.lower() == "nan": text = ""
+        if text.lower() == "nan":
+            text = ""
         
         ocr_text = str(row.get("ocr_text", ""))
-        if ocr_text.lower() == "nan": ocr_text = ""
+        if ocr_text.lower() == "nan":
+            ocr_text = ""
         
         asr_text = str(row.get("asr_transcript", ""))
-        if asr_text.lower() == "nan": asr_text = ""
+        if asr_text.lower() == "nan":
+            asr_text = ""
         
         return MultimodalFusionEngine.process(text, ocr_text, asr_text)
         

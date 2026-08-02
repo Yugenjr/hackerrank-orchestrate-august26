@@ -4,16 +4,24 @@
   "trace": [
     {
       "stage": "FeatureExtractionStage",
-      "latency_ms": 0.00858306884765625,
+      "latency_ms": 0.0171661376953125,
       "status": "success",
       "retries": 0,
       "degraded": false,
       "outputs": {
         "conversation_type": "personal",
         "forwarded_count": 0,
-        "baseline_scam_risk": false,
+        "user_dnd_active": false,
+        "user_global_dismissal_rate": 0.21495327102803738,
         "urgency": "low",
         "importance": "routine",
+        "scam_probability": 0.05,
+        "spam_probability": 0.1,
+        "requires_action": false,
+        "payment_related": false,
+        "event_related": false,
+        "personal_related": false,
+        "business_related": false,
         "safety": {
           "is_safe": true,
           "safety_reason": "Safety engine stub (M4 pending)",
@@ -24,47 +32,8 @@
       "error": null
     },
     {
-      "stage": "SafetyStage",
-      "latency_ms": 0.0007152557373046875,
-      "status": "success",
-      "retries": 0,
-      "degraded": false,
-      "outputs": {
-        "is_safe": true,
-        "safety_reason": "Safety engine stub (M4 pending)",
-        "safety_flags": []
-      },
-      "cache_hit": false,
-      "error": null
-    },
-    {
-      "stage": "RetrievalStage",
-      "latency_ms": 0.0073909759521484375,
-      "status": "success",
-      "retries": 0,
-      "degraded": false,
-      "outputs": {
-        "evidence_message_ids": [
-          "none"
-        ],
-        "retrieval_confidence": 0.0,
-        "retrieval_reason": "No historical evidence found (Cold Start).",
-        "retrieval_metadata": {
-          "candidate_count": 0,
-          "filtered_count": 0,
-          "bm25_score": 0.0,
-          "embedding_score": 0.0,
-          "recency_score": 0.0,
-          "fusion_score": 0.0,
-          "rerank_score": 0.0
-        }
-      },
-      "cache_hit": false,
-      "error": null
-    },
-    {
       "stage": "NotificationIntelligenceStage",
-      "latency_ms": 0.11110305786132812,
+      "latency_ms": 0.10371208190917969,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -148,8 +117,55 @@
       "error": null
     },
     {
+      "stage": "SafetyStage",
+      "latency_ms": 0.0016689300537109375,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "is_safe": true,
+        "safety_reason": "Safety engine stub (M4 pending)",
+        "safety_flags": []
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
+      "stage": "RetrievalStage",
+      "latency_ms": 3.369569778442383,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "evidence_message_ids": [
+          "message_0339"
+        ],
+        "retrieval_confidence": 0.7894324490142197,
+        "retrieval_reason": "High relevance semantic match. Score exceeded adaptive threshold 0.60",
+        "retrieval_metadata": {
+          "candidate_count": 3,
+          "filtered_count": 0,
+          "bm25_score": 1.0,
+          "embedding_score": 0.7831701636314392,
+          "recency_score": 0.7616438356164383,
+          "fusion_score": 0.7894324490142197,
+          "rerank_score": 0.0,
+          "evidence_list": [
+            {
+              "message_id": "message_0339",
+              "message_text": "You just dropped something...\n\nA membership, event, or entertainment update is available for your account.\n\nUnlock benefits, watchlist updates, or booking details from the app whenever convenient.\n\nReply STOP to unsubscribe",
+              "similarity": 0.7831701636314392,
+              "retrieval_score": 0.7894324490142197
+            }
+          ]
+        }
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
       "stage": "DecisionStage",
-      "latency_ms": 0.18644332885742188,
+      "latency_ms": 17.872095108032227,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -159,14 +175,14 @@
           "action": "digest",
           "message_type": "personal",
           "reason": "Digest: Low priority personal update, saved for later.",
-          "confidence": 0.5,
+          "confidence": 0.31595714285714277,
           "evidence_message_ids": "none"
         },
         "decision_trace": {
           "message_id": "msg_090",
           "steps": [
             {
-              "step": "deterministic_policy",
+              "step": "hard_policy",
               "matched": false
             },
             {
@@ -178,15 +194,25 @@
               "raw_decision": {
                 "action": "digest",
                 "message_type": "personal",
-                "llm_confidence": 0.8
+                "llm_confidence": 0.526595238095238
               }
             },
             {
               "step": "final_output",
               "action": "digest",
-              "confidence": 0.5
+              "confidence": 0.31595714285714277
             }
-          ]
+          ],
+          "explanation": {
+            "top_features_triggered": [
+              "ML Features Configured"
+            ],
+            "evidence_messages": [
+              "none"
+            ],
+            "soft_rules": [],
+            "hard_rule_triggered": null
+          }
         }
       },
       "cache_hit": false,
@@ -194,7 +220,7 @@
     },
     {
       "stage": "SerializationStage",
-      "latency_ms": 0.30303001403808594,
+      "latency_ms": 0.015020370483398438,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -209,14 +235,14 @@
       "action": "digest",
       "message_type": "personal",
       "reason": "Digest: Low priority personal update, saved for later.",
-      "confidence": 0.5,
+      "confidence": 0.31595714285714277,
       "evidence_message_ids": "none"
     },
     "decision_trace": {
       "message_id": "msg_090",
       "steps": [
         {
-          "step": "deterministic_policy",
+          "step": "hard_policy",
           "matched": false
         },
         {
@@ -228,15 +254,25 @@
           "raw_decision": {
             "action": "digest",
             "message_type": "personal",
-            "llm_confidence": 0.8
+            "llm_confidence": 0.526595238095238
           }
         },
         {
           "step": "final_output",
           "action": "digest",
-          "confidence": 0.5
+          "confidence": 0.31595714285714277
         }
-      ]
+      ],
+      "explanation": {
+        "top_features_triggered": [
+          "ML Features Configured"
+        ],
+        "evidence_messages": [
+          "none"
+        ],
+        "soft_rules": [],
+        "hard_rule_triggered": null
+      }
     }
   }
 }

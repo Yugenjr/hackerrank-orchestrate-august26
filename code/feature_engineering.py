@@ -3,8 +3,7 @@ Feature Engineering Module for Message Notification Router
 Computes deterministic features and aggregates contextual JSON payloads.
 """
 import logging
-from typing import Dict, Any, Union
-from datetime import datetime
+from typing import Dict, Any, Union, Tuple
 import pandas as pd
 
 from data_loader import DataLoader
@@ -15,7 +14,7 @@ class ContextBuilder:
     def __init__(self, data_loader: DataLoader):
         self.data_loader = data_loader
         # Cache DND parsed windows: { "22:00-07:00": (start_time, end_time) }
-        self._dnd_cache = {}
+        self._dnd_cache: Dict[str, Tuple[int, int]] = {}
 
     def build_context(self, message_row: Union[pd.Series, Dict[str, Any]]) -> Dict[str, Any]:
         """
@@ -26,7 +25,7 @@ class ContextBuilder:
             return message_row.get(key, default) if hasattr(message_row, "get") else getattr(message_row, key, default)
 
         user_id = str(get_val("user_id", ""))
-        sender_user_id = str(get_val("sender_user_id", ""))
+        str(get_val("sender_user_id", ""))
         group_id = str(get_val("group_id", ""))
         business_id = str(get_val("business_id", ""))
         created_at_str = str(get_val("created_at", ""))
@@ -48,16 +47,19 @@ class ContextBuilder:
             context["user_dnd_active"] = self._is_dnd_active(
                 created_at_str, str(user_info.get("do_not_disturb_window") or "")
             )
-            context["user_global_dismissal_rate"] = self._safe_divide(
-                user_info.get("notifications_dismissed_30d"),
-                (user_info.get("messages_opened_30d") or 1) + (user_info.get("notifications_dismissed_30d") or 0)
-            )
+            dismissed = user_info.get("notifications_dismissed_30d", 0)
+            opened = user_info.get("messages_opened_30d", 0)
+            context["user_global_dismissal_rate"] = self._safe_divide(dismissed, float(opened) + float(dismissed))
+        else:
+            context["user_dnd_active"] = False
+            context["user_global_dismissal_rate"] = 0.0
 
         # 2. Group Context
         if conversation_type == "group" and group_id and group_id.lower() != "nan":
             group_member_info = self.data_loader.get_group_member(group_id, user_id)
             if group_member_info is not None:
                 context["group_muted_by_user"] = bool(group_member_info.get("group_muted_by_user", False))
+                context["group_muted"] = context["group_muted_by_user"]
                 context["group_priority_score"] = self._safe_divide(
                     group_member_info.get("replies_sent_30d"),
                     group_member_info.get("messages_read_30d")
@@ -74,6 +76,12 @@ class ContextBuilder:
                 
                 reports = biz_info.get("user_reports_30d")
                 context["business_high_reports"] = int(reports) > 50 if reports is not None else False
+                context["baseline_scam_risk"] = context["business_trust_score"] <= 0.5
+            else:
+                context["business_trust_score"] = 0.0
+                context["business_verified"] = False
+                context["business_high_reports"] = False
+                context["baseline_scam_risk"] = True
 
             if biz_history is not None:
                 context["business_promotions_opted_out"] = biz_history.get("promotions_opted_out_at") is not None
@@ -81,11 +89,6 @@ class ContextBuilder:
                     biz_history.get("messages_replied_30d"),
                     biz_history.get("messages_opened_30d")
                 )
-
-        # 4. Scam Probability Baseline
-        context["baseline_scam_risk"] = (
-            int(forwarded_count) > 5 and context.get("business_trust_score", 1.0) < 0.5
-        )
 
         return context
 
@@ -98,8 +101,12 @@ class ContextBuilder:
             return False
             
         try:
-            # Only slice the time portion of ISO8601 (T14:30:00Z -> 14:30)
-            time_part = created_at.split('T')[1][:5]
+            # Handle both T and space separated ISO8601 datetimes
+            parts = created_at.replace('T', ' ').strip().split(' ')
+            if len(parts) > 1:
+                time_part = parts[1][:5]
+            else:
+                time_part = parts[0][:5]
             msg_hr, msg_min = map(int, time_part.split(':'))
             msg_mins = msg_hr * 60 + msg_min
             

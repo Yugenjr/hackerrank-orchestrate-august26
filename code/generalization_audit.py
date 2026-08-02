@@ -1,71 +1,100 @@
 import json
-import logging
 import pandas as pd
 import random
 from decision_engine import DecisionEngine
 from policies import PolicyEngine
-from schemas import FinalDecisionOutput
 
-def perturb_text(text):
-    if not isinstance(text, str):
-        return text
-    
-    # 1. Simulate OCR Noise (swap I and l, 0 and O)
-    text = text.replace('l', 'I').replace('O', '0')
-    
-    # 2. Add emojis
-    emojis = ['??', '??', '??', '??']
-    if random.random() > 0.5:
-        text = text + ' ' + random.choice(emojis)
-        
-    # 3. Spelling variations
-    if 'urgent' in text.lower():
-        text = text.replace('urgent', 'urgnt')
-        
+def apply_formatting_noise(text):
+    text = str(text)
+    mutations = [
+        lambda t: t.replace('l', 'I').replace('O', '0'),  # OCR
+        lambda t: t + ' ????',  # Emoji
+        lambda t: t.lower(),  # Casing
+        lambda t: t.replace(' ', '  ').replace('.', ''), # Whitespace/Punctuation
+        lambda t: t.replace('urgent', 'urgnt').replace('please', 'pls') # Spelling
+    ]
+    # Apply a random subset of mutations
+    for m in random.sample(mutations, k=2):  # nosec
+        text = m(text)
     return text
 
-def run_audit():
+def apply_semantic_flip(text):
+    text = str(text).lower()
+    flips = {
+        "confirmed": "cancelled",
+        "pay": "do not pay",
+        "approve": "reject",
+        "urgent": "not urgent",
+        "tomorrow": "next year",
+        "issue": "resolved",
+        "remind": "forget"
+    }
+    for k, v in flips.items():
+        if k in text:
+            return text.replace(k, v)
+    return text # No flip applied
+
+def run_generalization_testing():
     df = pd.read_csv('dataset/sample_messages.csv')
-    df = df.dropna(subset=['action', 'message_type'])
+    df = df.dropna(subset=['action'])
     
     policy_engine = PolicyEngine()
     engine = DecisionEngine(policy_engine)
     
     total = len(df)
-    stable = 0
     
+    # 1. Stability Testing
+    stable = 0
     for idx, row in df.iterrows():
         msg_id = row['message_id']
-        original_text = str(row['message_text'])
+        original = str(row['message_text'])
         
-        # Baseline run
-        payload = json.dumps({"message_text": original_text, "ocr_text": "", "asr_transcript": ""})
-        context = {"urgency": "low", "spam_probability": 0.0, "scam_probability": 0.0}
-        baseline_out, _ = engine.process(msg_id, payload, context, {"evidence": "none", "confidence": 0.8}, mode="C")
+        noisy = apply_formatting_noise(original)
         
-        # Perturbed run
-        perturbed = perturb_text(original_text)
-        payload_p = json.dumps({"message_text": perturbed, "ocr_text": "", "asr_transcript": ""})
-        pert_out, _ = engine.process(msg_id, payload_p, context, {"evidence": "none", "confidence": 0.8}, mode="C")
+        ctx = {"urgency": "low", "spam_probability": 0.0, "scam_probability": 0.0}
         
-        if baseline_out.action == pert_out.action:
+        p_orig = json.dumps({"message_text": original, "ocr_text": "", "asr_transcript": ""})
+        out_orig, _ = engine.process(msg_id, p_orig, ctx, {"evidence": "none", "confidence": 0.8}, mode="C")
+        
+        p_noisy = json.dumps({"message_text": noisy, "ocr_text": "", "asr_transcript": ""})
+        out_noisy, _ = engine.process(msg_id, p_noisy, ctx, {"evidence": "none", "confidence": 0.8}, mode="C")
+        
+        if out_orig.action == out_noisy.action:
             stable += 1
             
+    # 2. Semantic Sensitivity Testing
+    flipped_count = 0
+    sensitive = 0
+    for idx, row in df.iterrows():
+        msg_id = row['message_id']
+        original = str(row['message_text'])
+        
+        flipped = apply_semantic_flip(original)
+        if flipped == original.lower():
+            continue # Skip if no flip was possible
+            
+        flipped_count += 1
+        
+        ctx = {"urgency": "low", "spam_probability": 0.0, "scam_probability": 0.0}
+        p_orig = json.dumps({"message_text": original, "ocr_text": "", "asr_transcript": ""})
+        out_orig, _ = engine.process(msg_id, p_orig, ctx, {"evidence": "none", "confidence": 0.8}, mode="C")
+        
+        p_flipped = json.dumps({"message_text": flipped, "ocr_text": "", "asr_transcript": ""})
+        out_flipped, _ = engine.process(msg_id, p_flipped, ctx, {"evidence": "none", "confidence": 0.8}, mode="C")
+        
+        if out_orig.action != out_flipped.action:
+            sensitive += 1
+            
     stability_score = stable / total
-    print(f"==================================================")
-    print(f"GENERALIZATION AUDIT: ROBUSTNESS & STABILITY")
-    print(f"==================================================")
-    print(f"Total evaluated: {total}")
-    print(f"Stable predictions (no change across perturbations): {stable}")
-    print(f"Prediction Stability Score: {stability_score:.4f}")
+    sensitivity_score = sensitive / flipped_count if flipped_count > 0 else 0
     
-    with open('generalization_audit_report.md', 'w') as f:
-        f.write("# Generalization Audit Report\n\n")
-        f.write(f"- **Total Evaluated**: {total}\n")
-        f.write(f"- **Stable Predictions**: {stable}\n")
-        f.write(f"- **Prediction Stability Score**: {stability_score:.4f}\n")
-        f.write("\n## Perturbations Applied\n")
-        f.write("- OCR Noise (I/l, 0/O swaps)\n- Random Emoji Insertion\n- Spelling Variations (e.g. urgent -> urgnt)\n")
+    with open('generalization_report.md', 'w') as f:
+        f.write("# Generalization Testing Report\n\n")
+        f.write(f"- **Prediction Stability Score**: {stability_score:.4f} (Target: > 0.90)\n")
+        f.write(f"- **Semantic Sensitivity Score**: {sensitivity_score:.4f} (Target: > 0.50)\n")
+        f.write("\n## Details\n")
+        f.write(f"- Stable predictions under formatting noise: {stable}/{total}\n")
+        f.write(f"- Flipped predictions under semantic inversion: {sensitive}/{flipped_count}\n")
 
 if __name__ == '__main__':
-    run_audit()
+    run_generalization_testing()

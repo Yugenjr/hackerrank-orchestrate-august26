@@ -16,27 +16,30 @@ try:
 except ImportError:
     SKLEARN_AVAILABLE = False
 
-# --- LLM Provider Abstractions ---
-class LLMProvider:
-    def get_decision(self, combined_text: str, context: Dict) -> DecisionRouterOutput:
-        raise NotImplementedError
-
-class MockMLProvider(LLMProvider):
-    def __init__(self):
+# --- ML Model Singleton ---
+class MLModelSingleton:
+    _instance = None
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(MLModelSingleton, cls).__new__(cls)
+            cls._instance._init_ml_model()
+        return cls._instance
+        
+    def _init_ml_model(self):
         self._ml_action_model = None
         self._ml_type_model = None
         self.feature_names = []
         self.importances = []
-        self._init_ml_model()
-
-    def _init_ml_model(self):
-        if not SKLEARN_AVAILABLE: return
+        if not SKLEARN_AVAILABLE:
+            return
         csv_path = "dataset/sample_messages.csv"
         if os.path.exists(csv_path):
             try:
                 df = pd.read_csv(csv_path)
                 df = df.dropna(subset=['action', 'message_type'])
-                if len(df) == 0: return
+                if len(df) == 0:
+                    return
                 
                 texts = df['message_text'].fillna("").astype(str)
                 
@@ -60,11 +63,21 @@ class MockMLProvider(LLMProvider):
                 self._ml_action_model = None
                 self._ml_type_model = None
 
+# --- LLM Provider Abstractions ---
+class LLMProvider:
     def get_decision(self, combined_text: str, context: Dict) -> DecisionRouterOutput:
-        if self._ml_action_model is not None and self._ml_type_model is not None:
-            pred_action = self._ml_action_model.predict([combined_text])[0]
-            pred_type = self._ml_type_model.predict([combined_text])[0]
-            probs = self._ml_action_model.predict_proba([combined_text])[0]
+        raise NotImplementedError
+
+class MockMLProvider(LLMProvider):
+    def __init__(self):
+        self.model = MLModelSingleton()
+        self.feature_names = self.model.feature_names
+
+    def get_decision(self, combined_text: str, context: Dict) -> DecisionRouterOutput:
+        if self.model._ml_action_model is not None and self.model._ml_type_model is not None:
+            pred_action = self.model._ml_action_model.predict([combined_text])[0]
+            pred_type = self.model._ml_type_model.predict([combined_text])[0]
+            probs = self.model._ml_action_model.predict_proba([combined_text])[0]
             conf = max(probs)
             return DecisionRouterOutput(
                 action=cast(Literal["notify", "digest", "mute"], pred_action),
@@ -88,18 +101,28 @@ class DecisionEngine:
     def __init__(self, policy_engine: PolicyEngine):
         self.policy_engine = policy_engine
         self.llm_provider = ProviderFactory.get_provider()
+        
     def get_safety_assessment(self, payload: str, context: Dict) -> SafetyAgentOutput:
         # Mock LLM API call for hackathon tests
         return SafetyAgentOutput(is_safe=True, risk_category="none", risk_reason="")
         
-    def get_llm_decision(self, payload: str, context: Dict) -> DecisionRouterOutput:
+    def get_llm_decision(self, payload: str, context: Dict, retrieval_meta: Dict) -> DecisionRouterOutput:
         try:
             payload_dict = json.loads(payload)
             text = str(payload_dict.get("message_text", "")).lower()
             ocr = str(payload_dict.get("ocr_text", "")).lower()
             asr = str(payload_dict.get("asr_transcript", "")).lower()
             combined = " ".join([t for t in [text, ocr, asr] if t and t != "nan"])
-        except:
+            
+            # Incorporate semantic evidence
+            evidence_list = retrieval_meta.get("evidence_list", [])
+            if evidence_list:
+                best_evidence = evidence_list[0]
+                evidence_text = best_evidence.get("message_text", "")
+                if evidence_text:
+                    combined += " | HISTORICAL CONTEXT: " + evidence_text.lower()
+                    
+        except Exception:
             combined = ""
             
         return self.llm_provider.get_decision(combined, context)
@@ -132,9 +155,16 @@ class DecisionEngine:
         trace: Dict[str, Any] = {"message_id": msg_id, "steps": []}
         
         # Explainability Trace
-        internal_explanation = {
+        evidence_ids = retrieval_meta.get("evidence_message_ids", ["none"])
+        if isinstance(evidence_ids, list):
+            evidence_ids_str = ";".join(evidence_ids)
+        else:
+            evidence_ids_str = str(evidence_ids)
+            evidence_ids = [evidence_ids_str] # for internal explanation
+        
+        internal_explanation: Dict[str, Any] = {
             "top_features_triggered": [],
-            "evidence_messages": retrieval_meta.get("evidence", "none"),
+            "evidence_messages": evidence_ids,
             "soft_rules": [],
             "hard_rule_triggered": None
         }
@@ -153,7 +183,7 @@ class DecisionEngine:
                 logger.info(json.dumps({"event": "decision", "type": "hard_policy", "action": action, "msg_id": msg_id}))
                 return FinalDecisionOutput(
                     message_id=msg_id, action=action, message_type=msg_type, 
-                    reason=validated_reason, confidence=conf, evidence_message_ids=retrieval_meta.get("evidence", "none")
+                    reason=validated_reason, confidence=conf, evidence_message_ids=evidence_ids_str
                 ), trace
                 
             trace["steps"].append({"step": "hard_policy", "matched": False})
@@ -166,7 +196,7 @@ class DecisionEngine:
                 trace["explanation"] = internal_explanation
                 return FinalDecisionOutput(
                     message_id=msg_id, action=action, message_type=msg_type, 
-                    reason=reason, confidence=0.0, evidence_message_ids=retrieval_meta.get("evidence", "none")
+                    reason=reason, confidence=0.0, evidence_message_ids=evidence_ids_str
                 ), trace
         
         # 2. Safety Check (Overrides ALL downstream systems)
@@ -180,7 +210,7 @@ class DecisionEngine:
             trace["explanation"] = internal_explanation
             return FinalDecisionOutput(
                 message_id=msg_id, action=action, message_type=msg_type, 
-                reason=reason, confidence=conf, evidence_message_ids=retrieval_meta.get("evidence", "none")
+                reason=reason, confidence=conf, evidence_message_ids=evidence_ids_str
             ), trace
             
         # 3. Soft Policies Recommendations
@@ -188,7 +218,7 @@ class DecisionEngine:
         internal_explanation["soft_rules"] = soft_rules
             
         # 4. LLM Router
-        llm_decision = self.get_llm_decision(payload, context)
+        llm_decision = self.get_llm_decision(payload, context, retrieval_meta)
         trace["steps"].append({"step": "llm_router", "raw_decision": llm_decision.model_dump()})
         
         # Extract features if using ML Provider
@@ -196,7 +226,7 @@ class DecisionEngine:
             internal_explanation["top_features_triggered"] = ["ML Features Configured"]
         
         # 5. Conflict Resolution & Confidence
-        retrieval_conf = retrieval_meta.get("confidence", 0.0)
+        retrieval_conf = retrieval_meta.get("retrieval_confidence", 0.0)
         final_conf = self.calculate_confidence(llm_decision.llm_confidence, retrieval_conf, soft_rules, context)
         
         action_str = llm_decision.action
@@ -226,7 +256,7 @@ class DecisionEngine:
         logger.info(json.dumps({"event": "decision", "type": "llm_routed", "action": action, "msg_id": msg_id, "conf": final_conf}))
         return FinalDecisionOutput(
             message_id=msg_id, action=action, message_type=llm_decision.message_type, 
-            reason=reason, confidence=final_conf, evidence_message_ids=retrieval_meta.get("evidence", "none")
+            reason=reason, confidence=final_conf, evidence_message_ids=evidence_ids_str
         ), trace
         
     def counterfactual_analysis(self, msg_id: str, payload: str, context: Dict, retrieval_meta: Dict) -> Dict:

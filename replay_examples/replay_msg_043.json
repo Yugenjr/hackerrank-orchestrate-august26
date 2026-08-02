@@ -4,16 +4,27 @@
   "trace": [
     {
       "stage": "FeatureExtractionStage",
-      "latency_ms": 0.009059906005859375,
+      "latency_ms": 0.020742416381835938,
       "status": "success",
       "retries": 0,
       "degraded": false,
       "outputs": {
         "conversation_type": "group",
         "forwarded_count": 11,
-        "baseline_scam_risk": false,
+        "user_dnd_active": false,
+        "user_global_dismissal_rate": 0.16363636363636364,
+        "group_muted_by_user": false,
+        "group_muted": false,
+        "group_priority_score": 0.4666666666666667,
         "urgency": "low",
         "importance": "routine",
+        "scam_probability": 0.05,
+        "spam_probability": 0.1,
+        "requires_action": false,
+        "payment_related": false,
+        "event_related": false,
+        "personal_related": false,
+        "business_related": false,
         "safety": {
           "is_safe": true,
           "safety_reason": "Safety engine stub (M4 pending)",
@@ -24,47 +35,8 @@
       "error": null
     },
     {
-      "stage": "SafetyStage",
-      "latency_ms": 0.001430511474609375,
-      "status": "success",
-      "retries": 0,
-      "degraded": false,
-      "outputs": {
-        "is_safe": true,
-        "safety_reason": "Safety engine stub (M4 pending)",
-        "safety_flags": []
-      },
-      "cache_hit": false,
-      "error": null
-    },
-    {
-      "stage": "RetrievalStage",
-      "latency_ms": 0.0054836273193359375,
-      "status": "success",
-      "retries": 0,
-      "degraded": false,
-      "outputs": {
-        "evidence_message_ids": [
-          "none"
-        ],
-        "retrieval_confidence": 0.0,
-        "retrieval_reason": "No historical evidence found (Cold Start).",
-        "retrieval_metadata": {
-          "candidate_count": 0,
-          "filtered_count": 0,
-          "bm25_score": 0.0,
-          "embedding_score": 0.0,
-          "recency_score": 0.0,
-          "fusion_score": 0.0,
-          "rerank_score": 0.0
-        }
-      },
-      "cache_hit": false,
-      "error": null
-    },
-    {
       "stage": "NotificationIntelligenceStage",
-      "latency_ms": 0.09751319885253906,
+      "latency_ms": 0.09703636169433594,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -148,8 +120,55 @@
       "error": null
     },
     {
+      "stage": "SafetyStage",
+      "latency_ms": 0.0016689300537109375,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "is_safe": true,
+        "safety_reason": "Safety engine stub (M4 pending)",
+        "safety_flags": []
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
+      "stage": "RetrievalStage",
+      "latency_ms": 2.1347999572753906,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "evidence_message_ids": [
+          "message_0151"
+        ],
+        "retrieval_confidence": 0.8024931434300393,
+        "retrieval_reason": "High relevance semantic match. Score exceeded adaptive threshold 0.50",
+        "retrieval_metadata": {
+          "candidate_count": 31,
+          "filtered_count": 24,
+          "bm25_score": 1.0,
+          "embedding_score": 0.7810045480728149,
+          "recency_score": 0.9342465753424658,
+          "fusion_score": 0.8024931434300393,
+          "rerank_score": 0.0,
+          "evidence_list": [
+            {
+              "message_id": "message_0151",
+              "message_text": "Admin notice: access card penalty has to be cleared today. Scan this QR and send screenshot after payment.",
+              "similarity": 0.7810045480728149,
+              "retrieval_score": 0.8024931434300393
+            }
+          ]
+        }
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
       "stage": "DecisionStage",
-      "latency_ms": 0.17499923706054688,
+      "latency_ms": 18.64337921142578,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -157,16 +176,16 @@
         "decision": {
           "message_id": "msg_043",
           "action": "digest",
-          "message_type": "personal",
-          "reason": "Digest: Low priority personal update, saved for later.",
-          "confidence": 0.5,
+          "message_type": "urgent",
+          "reason": "Digest: Low priority urgent update, saved for later.",
+          "confidence": 0.2269,
           "evidence_message_ids": "none"
         },
         "decision_trace": {
           "message_id": "msg_043",
           "steps": [
             {
-              "step": "deterministic_policy",
+              "step": "hard_policy",
               "matched": false
             },
             {
@@ -177,16 +196,26 @@
               "step": "llm_router",
               "raw_decision": {
                 "action": "digest",
-                "message_type": "personal",
-                "llm_confidence": 0.8
+                "message_type": "urgent",
+                "llm_confidence": 0.37816666666666665
               }
             },
             {
               "step": "final_output",
               "action": "digest",
-              "confidence": 0.5
+              "confidence": 0.2269
             }
-          ]
+          ],
+          "explanation": {
+            "top_features_triggered": [
+              "ML Features Configured"
+            ],
+            "evidence_messages": [
+              "none"
+            ],
+            "soft_rules": [],
+            "hard_rule_triggered": null
+          }
         }
       },
       "cache_hit": false,
@@ -194,7 +223,7 @@
     },
     {
       "stage": "SerializationStage",
-      "latency_ms": 0.2524852752685547,
+      "latency_ms": 0.010251998901367188,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -207,16 +236,16 @@
     "decision": {
       "message_id": "msg_043",
       "action": "digest",
-      "message_type": "personal",
-      "reason": "Digest: Low priority personal update, saved for later.",
-      "confidence": 0.5,
+      "message_type": "urgent",
+      "reason": "Digest: Low priority urgent update, saved for later.",
+      "confidence": 0.2269,
       "evidence_message_ids": "none"
     },
     "decision_trace": {
       "message_id": "msg_043",
       "steps": [
         {
-          "step": "deterministic_policy",
+          "step": "hard_policy",
           "matched": false
         },
         {
@@ -227,16 +256,26 @@
           "step": "llm_router",
           "raw_decision": {
             "action": "digest",
-            "message_type": "personal",
-            "llm_confidence": 0.8
+            "message_type": "urgent",
+            "llm_confidence": 0.37816666666666665
           }
         },
         {
           "step": "final_output",
           "action": "digest",
-          "confidence": 0.5
+          "confidence": 0.2269
         }
-      ]
+      ],
+      "explanation": {
+        "top_features_triggered": [
+          "ML Features Configured"
+        ],
+        "evidence_messages": [
+          "none"
+        ],
+        "soft_rules": [],
+        "hard_rule_triggered": null
+      }
     }
   }
 }

@@ -4,16 +4,27 @@
   "trace": [
     {
       "stage": "FeatureExtractionStage",
-      "latency_ms": 0.008344650268554688,
+      "latency_ms": 0.023603439331054688,
       "status": "success",
       "retries": 0,
       "degraded": false,
       "outputs": {
         "conversation_type": "group",
         "forwarded_count": 8,
-        "baseline_scam_risk": false,
+        "user_dnd_active": false,
+        "user_global_dismissal_rate": 0.2891566265060241,
+        "group_muted_by_user": true,
+        "group_muted": true,
+        "group_priority_score": 0.3333333333333333,
         "urgency": "low",
         "importance": "routine",
+        "scam_probability": 0.05,
+        "spam_probability": 0.1,
+        "requires_action": false,
+        "payment_related": false,
+        "event_related": false,
+        "personal_related": false,
+        "business_related": false,
         "safety": {
           "is_safe": true,
           "safety_reason": "Safety engine stub (M4 pending)",
@@ -24,47 +35,8 @@
       "error": null
     },
     {
-      "stage": "SafetyStage",
-      "latency_ms": 0.001430511474609375,
-      "status": "success",
-      "retries": 0,
-      "degraded": false,
-      "outputs": {
-        "is_safe": true,
-        "safety_reason": "Safety engine stub (M4 pending)",
-        "safety_flags": []
-      },
-      "cache_hit": false,
-      "error": null
-    },
-    {
-      "stage": "RetrievalStage",
-      "latency_ms": 0.006198883056640625,
-      "status": "success",
-      "retries": 0,
-      "degraded": false,
-      "outputs": {
-        "evidence_message_ids": [
-          "none"
-        ],
-        "retrieval_confidence": 0.0,
-        "retrieval_reason": "No historical evidence found (Cold Start).",
-        "retrieval_metadata": {
-          "candidate_count": 0,
-          "filtered_count": 0,
-          "bm25_score": 0.0,
-          "embedding_score": 0.0,
-          "recency_score": 0.0,
-          "fusion_score": 0.0,
-          "rerank_score": 0.0
-        }
-      },
-      "cache_hit": false,
-      "error": null
-    },
-    {
       "stage": "NotificationIntelligenceStage",
-      "latency_ms": 0.09560585021972656,
+      "latency_ms": 0.08916854858398438,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -148,43 +120,45 @@
       "error": null
     },
     {
-      "stage": "DecisionStage",
-      "latency_ms": 0.16021728515625,
+      "stage": "SafetyStage",
+      "latency_ms": 0.0011920928955078125,
       "status": "success",
       "retries": 0,
       "degraded": false,
       "outputs": {
-        "decision": {
-          "message_id": "msg_061",
-          "action": "digest",
-          "message_type": "personal",
-          "reason": "Digest: Low priority personal update, saved for later.",
-          "confidence": 0.5,
-          "evidence_message_ids": "none"
-        },
-        "decision_trace": {
-          "message_id": "msg_061",
-          "steps": [
+        "is_safe": true,
+        "safety_reason": "Safety engine stub (M4 pending)",
+        "safety_flags": []
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
+      "stage": "RetrievalStage",
+      "latency_ms": 1.5583038330078125,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "evidence_message_ids": [
+          "message_0080"
+        ],
+        "retrieval_confidence": 0.7535081537891197,
+        "retrieval_reason": "High relevance semantic match. Score exceeded adaptive threshold 0.50",
+        "retrieval_metadata": {
+          "candidate_count": 14,
+          "filtered_count": 6,
+          "bm25_score": 1.0,
+          "embedding_score": 0.7644781470298767,
+          "recency_score": 0.6438356164383562,
+          "fusion_score": 0.7535081537891197,
+          "rerank_score": 0.0,
+          "evidence_list": [
             {
-              "step": "deterministic_policy",
-              "matched": false
-            },
-            {
-              "step": "safety_check",
-              "is_safe": true
-            },
-            {
-              "step": "llm_router",
-              "raw_decision": {
-                "action": "digest",
-                "message_type": "personal",
-                "llm_confidence": 0.8
-              }
-            },
-            {
-              "step": "final_output",
-              "action": "digest",
-              "confidence": 0.5
+              "message_id": "message_0080",
+              "message_text": "Good morning. Stay positive and send this to ten people you care about.",
+              "similarity": 0.7644781470298767,
+              "retrieval_score": 0.7535081537891197
             }
           ]
         }
@@ -193,8 +167,46 @@
       "error": null
     },
     {
+      "stage": "DecisionStage",
+      "latency_ms": 0.3204345703125,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "decision": {
+          "message_id": "msg_061",
+          "action": "mute",
+          "message_type": "group_chat",
+          "reason": "Deterministic match: User has muted this group.",
+          "confidence": 1.0,
+          "evidence_message_ids": "none"
+        },
+        "decision_trace": {
+          "message_id": "msg_061",
+          "steps": [
+            {
+              "step": "hard_policy",
+              "matched": true,
+              "action": "mute",
+              "rule_reason": "Deterministic match: User has muted this group."
+            }
+          ],
+          "explanation": {
+            "top_features_triggered": [],
+            "evidence_messages": [
+              "none"
+            ],
+            "soft_rules": [],
+            "hard_rule_triggered": "Deterministic match: User has muted this group."
+          }
+        }
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
       "stage": "SerializationStage",
-      "latency_ms": 0.2543926239013672,
+      "latency_ms": 0.007152557373046875,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -206,37 +218,30 @@
   "decision": {
     "decision": {
       "message_id": "msg_061",
-      "action": "digest",
-      "message_type": "personal",
-      "reason": "Digest: Low priority personal update, saved for later.",
-      "confidence": 0.5,
+      "action": "mute",
+      "message_type": "group_chat",
+      "reason": "Deterministic match: User has muted this group.",
+      "confidence": 1.0,
       "evidence_message_ids": "none"
     },
     "decision_trace": {
       "message_id": "msg_061",
       "steps": [
         {
-          "step": "deterministic_policy",
-          "matched": false
-        },
-        {
-          "step": "safety_check",
-          "is_safe": true
-        },
-        {
-          "step": "llm_router",
-          "raw_decision": {
-            "action": "digest",
-            "message_type": "personal",
-            "llm_confidence": 0.8
-          }
-        },
-        {
-          "step": "final_output",
-          "action": "digest",
-          "confidence": 0.5
+          "step": "hard_policy",
+          "matched": true,
+          "action": "mute",
+          "rule_reason": "Deterministic match: User has muted this group."
         }
-      ]
+      ],
+      "explanation": {
+        "top_features_triggered": [],
+        "evidence_messages": [
+          "none"
+        ],
+        "soft_rules": [],
+        "hard_rule_triggered": "Deterministic match: User has muted this group."
+      }
     }
   }
 }

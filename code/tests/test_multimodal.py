@@ -1,6 +1,5 @@
 import os
 import sys
-import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from ner_engine import NEREngine
@@ -27,21 +26,21 @@ def test_structural_extractors():
 
 def test_contradiction():
     res = ContradictionEngine.detect(text="Pay this urgent invoice", ocr_text="Free gift inside")
-    assert res.has_contradiction == True
+    assert res.has_contradiction
     
     res2 = ContradictionEngine.detect(text="Hello", ocr_text="World")
-    assert res2.has_contradiction == False
+    assert not res2.has_contradiction
 
 def test_notification_signals():
     res = NotificationSignalEngine.extract(text="Please pay the urgent invoice by tomorrow.")
     assert res.urgency.value == "high"
-    assert res.requires_action.value == True
-    assert res.payment_related.value == True
-    assert res.business_related.value == True
+    assert res.requires_action.value
+    assert res.payment_related.value
+    assert res.business_related.value
 
 def test_multimodal_fusion():
     ctx = MultimodalFusionEngine.process(text="Pay $50", ocr_text="Due tomorrow")
-    assert ctx.has_media == True
+    assert ctx.has_media
     assert len(ctx.entities.money) == 1
     assert len(ctx.structures.deadlines) == 1
-    assert ctx.features.payment_related.value == True
+    assert ctx.features.payment_related.value

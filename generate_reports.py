@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 
 # Load ground truth and mode C output
 gt = pd.read_csv('dataset/sample_messages.csv')

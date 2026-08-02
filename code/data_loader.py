@@ -4,7 +4,7 @@ Handles efficient loading and indexing of all CSV datasets.
 """
 import os
 import logging
-from typing import Dict, Optional, Any, Union, Tuple
+from typing import Dict, Optional, Any
 import pandas as pd
 import numpy as np
 
@@ -14,10 +14,10 @@ class DataLoader:
     def __init__(self, dataset_dir: str = "dataset"):
         self.dataset_dir = dataset_dir
         # Store as pure Python dicts for absolute max performance (O(1) lookups without pandas Series overhead)
-        self.data_dicts: Dict[str, Dict[Any, Dict[str, Any]]] = {}
+        self.data_dicts: Dict[str, Any] = {}
         
         # Define expected files and their index columns
-        self.index_config = {
+        self.index_config: Dict[str, Any] = {
             "users.csv": "user_id",
             "groups.csv": "group_id",
             "group_members.csv": ["group_id", "user_id"],
@@ -42,7 +42,7 @@ class DataLoader:
                 
             self._load_csv(filename, file_path, index_col)
             
-    def _load_csv(self, filename: str, file_path: str, index_col: Union[str, list]) -> None:
+    def _load_csv(self, filename: str, file_path: str, index_col: Any) -> None:
         """Loads a single CSV and converts it to a native dictionary indexed by the primary key."""
         if not os.path.exists(file_path):
             logger.warning(f"File not found: {file_path}. Skipping.")

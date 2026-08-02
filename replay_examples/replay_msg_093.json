@@ -4,16 +4,28 @@
   "trace": [
     {
       "stage": "FeatureExtractionStage",
-      "latency_ms": 0.009298324584960938,
+      "latency_ms": 0.024318695068359375,
       "status": "success",
       "retries": 0,
       "degraded": false,
       "outputs": {
         "conversation_type": "business",
         "forwarded_count": 0,
+        "user_dnd_active": true,
+        "user_global_dismissal_rate": 0.4810126582278481,
+        "business_trust_score": 1.0,
+        "business_verified": true,
+        "business_high_reports": false,
         "baseline_scam_risk": false,
         "urgency": "medium",
         "importance": "routine",
+        "scam_probability": 0.05,
+        "spam_probability": 0.1,
+        "requires_action": true,
+        "payment_related": true,
+        "event_related": false,
+        "personal_related": false,
+        "business_related": false,
         "safety": {
           "is_safe": true,
           "safety_reason": "Safety engine stub (M4 pending)",
@@ -24,47 +36,8 @@
       "error": null
     },
     {
-      "stage": "SafetyStage",
-      "latency_ms": 0.0011920928955078125,
-      "status": "success",
-      "retries": 0,
-      "degraded": false,
-      "outputs": {
-        "is_safe": true,
-        "safety_reason": "Safety engine stub (M4 pending)",
-        "safety_flags": []
-      },
-      "cache_hit": false,
-      "error": null
-    },
-    {
-      "stage": "RetrievalStage",
-      "latency_ms": 0.00667572021484375,
-      "status": "success",
-      "retries": 0,
-      "degraded": false,
-      "outputs": {
-        "evidence_message_ids": [
-          "none"
-        ],
-        "retrieval_confidence": 0.0,
-        "retrieval_reason": "No historical evidence found (Cold Start).",
-        "retrieval_metadata": {
-          "candidate_count": 0,
-          "filtered_count": 0,
-          "bm25_score": 0.0,
-          "embedding_score": 0.0,
-          "recency_score": 0.0,
-          "fusion_score": 0.0,
-          "rerank_score": 0.0
-        }
-      },
-      "cache_hit": false,
-      "error": null
-    },
-    {
       "stage": "NotificationIntelligenceStage",
-      "latency_ms": 0.10609626770019531,
+      "latency_ms": 0.10371208190917969,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -148,8 +121,48 @@
       "error": null
     },
     {
+      "stage": "SafetyStage",
+      "latency_ms": 0.00095367431640625,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "is_safe": true,
+        "safety_reason": "Safety engine stub (M4 pending)",
+        "safety_flags": []
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
+      "stage": "RetrievalStage",
+      "latency_ms": 0.3669261932373047,
+      "status": "success",
+      "retries": 0,
+      "degraded": false,
+      "outputs": {
+        "evidence_message_ids": [
+          "none"
+        ],
+        "retrieval_confidence": 0.0,
+        "retrieval_reason": "No historical evidence found.",
+        "retrieval_metadata": {
+          "candidate_count": 0,
+          "filtered_count": 0,
+          "bm25_score": 0.0,
+          "embedding_score": 0.0,
+          "recency_score": 0.0,
+          "fusion_score": 0.0,
+          "rerank_score": 0.0,
+          "evidence_list": []
+        }
+      },
+      "cache_hit": false,
+      "error": null
+    },
+    {
       "stage": "DecisionStage",
-      "latency_ms": 0.1723766326904297,
+      "latency_ms": 0.3509521484375,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -158,35 +171,28 @@
           "message_id": "msg_093",
           "action": "digest",
           "message_type": "personal",
-          "reason": "Digest: Low priority personal update, saved for later.",
-          "confidence": 0.5,
+          "reason": "Deterministic match: User has DND active.",
+          "confidence": 1.0,
           "evidence_message_ids": "none"
         },
         "decision_trace": {
           "message_id": "msg_093",
           "steps": [
             {
-              "step": "deterministic_policy",
-              "matched": false
-            },
-            {
-              "step": "safety_check",
-              "is_safe": true
-            },
-            {
-              "step": "llm_router",
-              "raw_decision": {
-                "action": "digest",
-                "message_type": "personal",
-                "llm_confidence": 0.8
-              }
-            },
-            {
-              "step": "final_output",
+              "step": "hard_policy",
+              "matched": true,
               "action": "digest",
-              "confidence": 0.5
+              "rule_reason": "Deterministic match: User has DND active."
             }
-          ]
+          ],
+          "explanation": {
+            "top_features_triggered": [],
+            "evidence_messages": [
+              "none"
+            ],
+            "soft_rules": [],
+            "hard_rule_triggered": "Deterministic match: User has DND active."
+          }
         }
       },
       "cache_hit": false,
@@ -194,7 +200,7 @@
     },
     {
       "stage": "SerializationStage",
-      "latency_ms": 0.30732154846191406,
+      "latency_ms": 0.0069141387939453125,
       "status": "success",
       "retries": 0,
       "degraded": false,
@@ -208,35 +214,28 @@
       "message_id": "msg_093",
       "action": "digest",
       "message_type": "personal",
-      "reason": "Digest: Low priority personal update, saved for later.",
-      "confidence": 0.5,
+      "reason": "Deterministic match: User has DND active.",
+      "confidence": 1.0,
       "evidence_message_ids": "none"
     },
     "decision_trace": {
       "message_id": "msg_093",
       "steps": [
         {
-          "step": "deterministic_policy",
-          "matched": false
-        },
-        {
-          "step": "safety_check",
-          "is_safe": true
-        },
-        {
-          "step": "llm_router",
-          "raw_decision": {
-            "action": "digest",
-            "message_type": "personal",
-            "llm_confidence": 0.8
-          }
-        },
-        {
-          "step": "final_output",
+          "step": "hard_policy",
+          "matched": true,
           "action": "digest",
-          "confidence": 0.5
+          "rule_reason": "Deterministic match: User has DND active."
         }
-      ]
+      ],
+      "explanation": {
+        "top_features_triggered": [],
+        "evidence_messages": [
+          "none"
+        ],
+        "soft_rules": [],
+        "hard_rule_triggered": "Deterministic match: User has DND active."
+      }
     }
   }
 }

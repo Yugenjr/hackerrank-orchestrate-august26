@@ -7,7 +7,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from orchestrator.stage import PipelineStage
 from orchestrator.context import PipelineContext
 from decision_engine import DecisionEngine
-from schemas import FinalDecisionOutput
 
 class DecisionStage(PipelineStage):
     def __init__(self, decision_engine: DecisionEngine):
@@ -37,7 +36,9 @@ class DecisionStage(PipelineStage):
         # Format retrieval metadata for Decision Engine
         ret_meta = {
             "evidence": ";".join(retrieval_res.get("evidence_message_ids", ["none"])),
-            "confidence": retrieval_res.get("retrieval_confidence", 0.0)
+            "confidence": retrieval_res.get("retrieval_confidence", 0.0),
+            "evidence_list": retrieval_res.get("retrieval_metadata", {}).get("evidence_list", []),
+            "evidence_message_ids": retrieval_res.get("evidence_message_ids", ["none"])
         }
         
         # Format context (merging features and intelligence signals)

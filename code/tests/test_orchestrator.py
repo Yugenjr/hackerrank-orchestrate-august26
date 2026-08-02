@@ -7,7 +7,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from orchestrator.context import PipelineContext
 from orchestrator.stage import PipelineStage
 from orchestrator.dag import DAGOrchestrator
-from orchestrator.hooks import PipelineHooks
 
 class DummyStage(PipelineStage):
     def __init__(self, name: str, deps=None, duration=0.01, fails=False, critical=True):
@@ -34,7 +33,11 @@ class DummyStage(PipelineStage):
             raise ValueError(f"Simulated failure in {self._name}")
         return f"{self._name}_done"
 
-@pytest.mark.asyncio
+@pytest.fixture
+def anyio_backend():
+    return 'asyncio'
+
+@pytest.mark.anyio
 async def test_dag_sequential_and_parallel():
     orch = DAGOrchestrator()
     # A runs first. B and C depend on A and run in parallel. D depends on B and C.
@@ -56,7 +59,7 @@ async def test_dag_sequential_and_parallel():
     assert stages_run[-1] == "D"
     assert set(stages_run[1:3]) == {"B", "C"}  # B and C completed between A and D
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_dag_retry_and_degrade():
     orch = DAGOrchestrator()
     s1 = DummyStage("NonCrit", fails=True, critical=False)
@@ -68,9 +71,9 @@ async def test_dag_retry_and_degrade():
     assert s1.retry_count == 2 # Initial attempt + 1 retry
     assert ctx.get_result("NonCrit") is None
     assert ctx.trace[0].status == "failed"
-    assert ctx.trace[0].degraded == True
+    assert ctx.trace[0].degraded
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_dag_critical_failure():
     orch = DAGOrchestrator()
     s1 = DummyStage("Crit", fails=True, critical=True)

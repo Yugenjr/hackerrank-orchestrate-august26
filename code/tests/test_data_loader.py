@@ -1,7 +1,6 @@
 import os
 import sys
 import pytest
-import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from data_loader import DataLoader
@@ -40,7 +39,7 @@ def test_data_loader_initialization(mock_dataset_dir):
     # Test multi-index lookup
     member = loader.get_group_member("g1", "u1")
     assert member is not None
-    assert member["group_muted_by_user"] == True
+    assert member["group_muted_by_user"]
     
     # Test missing file graceful handling
     # (e.g. messages.csv wasn't created in the mock, should not crash if handled properly, though load_csv warns)

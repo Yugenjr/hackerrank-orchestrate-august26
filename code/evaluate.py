@@ -1,11 +1,6 @@
 import os
-import sys
-import json
-import time
 import asyncio
 import pandas as pd
-from typing import List, Dict, Any
-import csv
 
 from orchestrator.context import PipelineContext
 from orchestrator.dag import DAGOrchestrator
@@ -56,7 +51,7 @@ async def run_evaluation(mode: str):
     for idx, row in df.iterrows():
         msg_id = str(row["message_id"])
         # We must drop the ground truth columns before passing to the pipeline!
-        payload = {k: v for k, v in row.to_dict().items() if pd.notnull(v)}
+        payload = {str(k): v for k, v in row.to_dict().items() if pd.notnull(v)}
         ground_truth = {
             "action": payload.pop("action", "digest"),
             "message_type": payload.pop("message_type", "unknown"),
@@ -176,7 +171,7 @@ async def main():
         with open("leaderboard_readiness.md", "w", encoding='utf-8') as f:
             f.write("# Leaderboard Readiness Report\n\n")
             f.write(f"- **Final Hybrid Accuracy on Dataset**: {acc_c*100:.1f}%\n")
-            f.write(f"- **Status**: READY FOR SUBMISSION\n")
+            f.write("- **Status**: READY FOR SUBMISSION\n")
             
         with open("calibration_report.md", "w", encoding='utf-8') as f:
             f.write("# Confidence Calibration\n\n")
@@ -187,7 +182,7 @@ async def main():
         with open("leaderboard_readiness.md", "w", encoding='utf-8') as f:
             f.write("# Leaderboard Readiness Report\n\n")
             f.write("- **Final Hybrid Accuracy on Dataset**: Unknown (Hidden Labels)\n")
-            f.write(f"- **Status**: READY FOR SUBMISSION\n")
+            f.write("- **Status**: READY FOR SUBMISSION\n")
         
     print("Evaluation complete. Generated reports.")
 

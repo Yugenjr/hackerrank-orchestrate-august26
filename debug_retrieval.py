@@ -11,7 +11,7 @@ ret_engine = RetrievalEngine(loader, use_mocks=False)
 
 df = pd.read_csv('dataset/sample_messages.csv')
 row = df.iloc[0].to_dict()
-payload = {k: v for k, v in row.items() if pd.notnull(v)}
+payload = {str(k): v for k, v in row.items() if pd.notnull(v)}
 
 features = ctx_builder.build_context(payload)
 query_norm = QueryExpander.normalize(ret_engine._get_text_payload(payload))
